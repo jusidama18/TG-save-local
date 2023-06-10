@@ -26,7 +26,7 @@ async def download(client, message):
                     mID=message.id,
                     prog_text="`Downloading This File!`",
                     file_name=file_name,
-                    extra_text = ({"Files": f"{index} / {len(messages)}"})
+                    extra_text=({"Files": f"{index} / {len(messages)}"}),
                 )
                 output = await file.download(progress=prog.progress)
                 text += f"**{index}.** `{output}`"
@@ -44,7 +44,7 @@ async def download(client, message):
             prog_text="`Downloading This File!`",
             file_name=file_name,
         )
-        
+
         output = await message.download(progress=prog.progress)
         await msg.edit(f"**Finish Download :** `{output}`")
     elif message.text.startswith(("https://t.me/", "tg://openmessage?user_id=")):
@@ -79,7 +79,7 @@ async def download(client, message):
                 prog_text="`Downloading This File!`",
                 file_name=file_name,
             )
-            
+
             await messages.download(progress=prog.progress)
         else:
             await message.reply("Download what?")
@@ -102,6 +102,7 @@ async def cancel_download(_, query):
         await query.answer(
             "This Is Not Your Download. So, dont touch on this.", show_alert=True
         )
+
 
 @Client.on_message(filters.command("ls"))
 async def ls(_, message):
@@ -130,4 +131,6 @@ async def ls(_, message):
     except errors.MessageTooLong:
         with BytesIO(text.encode()) as file:
             file.name = "File-List.txt"
-            return await message.reply_document(file, caption="File List Too Long.", quote=True)
+            return await message.reply_document(
+                file, caption="File List Too Long.", quote=True
+            )
