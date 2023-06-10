@@ -28,6 +28,8 @@ async def download(client, message):
         await msg.edit(text)
     elif message.media and not message.empty:
         msg = await message.reply("`Start Download File`")
+        file_data = getattr(message, message.media.value, None)
+        file_name = (getattr(file_data, "file_name", None),)
         prog = Progress(
             message=msg,
             user=message.from_user.id,
@@ -35,9 +37,9 @@ async def download(client, message):
             chatID=message.chat.id,
             mID=message.id,
             prog_text="`Downloading This File!`",
+            file_name=file_name,
         )
-        file_data = getattr(message, message.media.value, None)
-        prog.file_name = (getattr(file_data, "file_name", None),)
+        
         output = await message.download(progress=prog.progress)
         await msg.edit(f"**Finish Download :** `{output}`")
     elif message.text.startswith(("https://t.me/", "tg://openmessage?user_id=")):
