@@ -34,6 +34,8 @@ async def filter_tg_link(client, message):
         and session != "user"
     ):
         return "Use SuperGroup to download with User!"
+    if session == "user":
+        messages = await client.userbot.copy_message(chat_id=bot_id, from_chat_id=messages.chat.id, message_id=messages.id)
     return messages if messages.media else "Link Provided not telegram media."
 
 
