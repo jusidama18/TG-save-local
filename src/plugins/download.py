@@ -99,14 +99,17 @@ async def download(client, message):
                 file_name=file_name,
                 extra_text=({"Files": f"{index} / {len(messages)}"}),
             )
-            
+            new_folder_dir = download_dir
             if not folder_name:
-                folder_name = str(file.media.value)
-                download_dir = download_dir.joinpath(folder_name)
-    
-            download_dir = download_dir.joinpath(file_name)
+                new_folder_dir = new_folder_dir.joinpath(str(file.media.value))
+            
+            if file_name:
+                new_folder_dir = new_folder_dir.joinpath(file_name).absolute()
+            else:
+                new_folder_dir = f"{new_folder_dir.absolute()}/"
+            
             logger.info(f"Start Downloading : {file_name}")
-            output = await file.download(download_dir, progress=prog.progress)
+            output = await file.download(new_folder_dir, progress=prog.progress)
             text += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(path)).st_size)}]**"
     dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
     text += f"\n\n**Time Taken : {dlTime}**"
