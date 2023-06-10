@@ -71,7 +71,7 @@ async def download(client, message):
     elif message.text.startswith(("https://t.me/", "tg://openmessage?user_id=")):
         messages = await filter_tg_link(client, message)
         if not isinstance(messages, Message):
-            return await msg.edit(messages)
+            return await message.reply(messages)
         messages = [messages]
     else:
         return await message.reply("`Send File or Telegram message of file link`")
