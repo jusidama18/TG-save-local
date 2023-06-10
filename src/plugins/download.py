@@ -39,7 +39,7 @@ async def download(client, message):
             prog_text="`Downloading This File!`",
             file_name=file_name,
         )
-        
+
         output = await message.download(progress=prog.progress)
         await msg.edit(f"**Finish Download :** `{output}`")
     elif message.text.startswith(("https://t.me/", "tg://openmessage?user_id=")):
