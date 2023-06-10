@@ -61,7 +61,6 @@ class HumanFormat:
             real_size = f"{str(round(size, 2))} {SIZE_UNITS[-1]}"
         return real_size
 
-
     @staticmethod
     def Time(milliseconds: int, milli: bool = False, units: str = None) -> str:
         # sourcery skip: low-code-quality
