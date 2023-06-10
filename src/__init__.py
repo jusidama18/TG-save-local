@@ -50,4 +50,4 @@ if session_string is not None:
 else:
     app.userbot = None
 
-OWNER_ID = str(getenv("OWNER_ID", "")).split()
+OWNER_ID = [int(i) for i in str(getenv("OWNER_ID", "")).split()]
