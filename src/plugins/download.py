@@ -29,17 +29,18 @@ async def filter_tg_link(client, message):
     except ValueError as e:
         return e
 
-    if (
-        messages.chat.type.name not in ["SUPERGROUP", "CHANNEL"]
-        and session != "user"
-    ):
+    if messages.chat.type.name not in ["SUPERGROUP", "CHANNEL"] and session != "user":
         return "Use SuperGroup to download with User!"
     if session == "user":
         try:
-            messages = await client.userbot.copy_message(chat_id=bot_id, from_chat_id=messages.chat.id, message_id=messages.id)
+            messages = await client.userbot.copy_message(
+                chat_id=bot_id, from_chat_id=messages.chat.id, message_id=messages.id
+            )
         except PeerIdInvalid:
             await client.userbot.send_message(bot_id, "/start")
-            messages = await client.userbot.copy_message(chat_id=bot_id, from_chat_id=messages.chat.id, message_id=messages.id)
+            messages = await client.userbot.copy_message(
+                chat_id=bot_id, from_chat_id=messages.chat.id, message_id=messages.id
+            )
     return messages if messages.media else "Link Provided not telegram media."
 
 
@@ -69,7 +70,9 @@ async def download(client, message):
         else:
             messages = [message]
     elif message.text:
-        links_list = [item.strip() for item in message.text.splitlines() if len(item) != 0]
+        links_list = [
+            item.strip() for item in message.text.splitlines() if len(item) != 0
+        ]
         messages = [
             line
             for line in links_list
