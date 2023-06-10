@@ -12,13 +12,14 @@ from src.utils.readable import HumanFormat
 
 logger = logging.getLogger(__name__)
 
-@Client.on_message(filters.private & filters.chat(OWNER_ID), group=1)
+@Client.on_message(filters.private & filters.user(OWNER_ID), group=1)
 async def download(client, message):
     start = datetime.now()
     if message.media_group_id:
         messages = await message.get_media_group()
         msg = await message.reply(f"`Start Download {len(messages)} Files`")
         text = "**Finish Download :**\n"
+        allFinish = []
         for index, file in enumerate(messages, start=1):
             if not file.empty:
                 file_data = getattr(file, file.media.value, None)
@@ -35,6 +36,14 @@ async def download(client, message):
                 )
                 logger.info(f"Start Downloading : {file_name}")
                 output = await file.download(progress=prog.progress)
+                allFinish.append(output)
+                if prog.is_cancelled:
+                    for fl in allFinish:
+                        if os.path.exists(fl):
+                            os.remove(fl)
+                    text = f"**All Download is cancelled in** `{dlTime}`\n"
+                    text += "\n".join(f"{index}. {name}" for index, name in enumerate(allFinish, start=1))
+                    return await msg.edit(text)
                 text += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes(os.stat(output).st_size)}]**"
         dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
         text += f"\n\n**Time Taken : {dlTime}**"
