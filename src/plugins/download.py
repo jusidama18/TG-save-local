@@ -19,6 +19,7 @@ from src.utils.readable import HumanFormat
 
 logger = logging.getLogger(__name__)
 
+
 async def filter_tg_link(client, message):
     try:
         messages, session = await get_tg_link_content(
@@ -58,8 +59,13 @@ async def download(client, message):
             text_file_dir = await message.download()
             async with aiofiles.open(text_file_dir, "r+") as f:
                 lines = await f.readlines()
-                links_list.extend(line.strip() for line in lines if len(line) != 0)
-            messages = [line for line in links_list if line.startswith(("https://t.me/", "tg://openmessage?user_id="))]
+                links_list.extend(line.strip()
+                                  for line in lines if len(line) != 0)
+            messages = [
+                line
+                for line in links_list
+                if line.startswith(("https://t.me/", "tg://openmessage?user_id="))
+            ]
         else:
             messages = [message]
     elif message.text.startswith(("https://t.me/", "tg://openmessage?user_id=")):
@@ -77,7 +83,7 @@ async def download(client, message):
 
     if folder_name:
         download_dir = download_dir.joinpath(folder_name)
-    
+
     for index, file in enumerate(messages, start=1):
         if not isinstance(file, Message):
             o_file = file
@@ -99,11 +105,11 @@ async def download(client, message):
                 file_name=file_name,
                 extra_text=({"Files": f"{index} / {len(messages)}"}),
             )
-            
+
             if not folder_name:
                 folder_name = str(file.media.value)
                 download_dir = download_dir.joinpath(folder_name)
-    
+
             download_dir = download_dir.joinpath(file_name)
             logger.info(f"Start Downloading : {file_name}")
             output = await file.download(download_dir, progress=prog.progress)
@@ -111,6 +117,7 @@ async def download(client, message):
     dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
     text += f"\n\n**Time Taken : {dlTime}**"
     await msg.edit(text)
+
 
 @Client.on_callback_query(
     filters.regex(r"^progress (?P<chatID>-?\d+) (?P<mID>\d+) (?P<user>\d+)")
