@@ -3,7 +3,7 @@ import logging
 import aiofiles
 
 from io import BytesIO
-from aiofiles.os import remove, path, stat, listdir
+from aiofiles.os import path, stat, listdir
 
 from datetime import datetime
 
@@ -66,7 +66,6 @@ async def download(client, message):
 
     msg = await message.reply(f"`Start Download {len(messages)} Files`")
     text = "**Finish Download :**\n"
-    allFinish = []
     for index, file in enumerate(messages, start=1):
         if not isinstance(file, Message):
             o_file = file
@@ -89,17 +88,6 @@ async def download(client, message):
             )
             logger.info(f"Start Downloading : {file_name}")
             output = await file.download(progress=prog.progress)
-            allFinish.append(output)
-            if prog.is_cancelled:
-                for fl in allFinish:
-                    if await path.exists(fl):
-                        await remove(fl)
-                text = f"**All Download is cancelled in** `{dlTime}`\n"
-                text += "\n".join(
-                    f"{index}. {name}"
-                    for index, name in enumerate(allFinish, start=1)
-                )
-                return await msg.edit(text)
             text += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(path)).st_size)}]**"
     dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
     text += f"\n\n**Time Taken : {dlTime}**"
