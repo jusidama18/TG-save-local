@@ -29,13 +29,12 @@ async def filter_tg_link(client, message):
     except ValueError as e:
         return e
 
-    if (
-        messages.chat.type.name not in ["SUPERGROUP", "CHANNEL"]
-        and session != "user"
-    ):
+    if messages.chat.type.name not in ["SUPERGROUP", "CHANNEL"] and session != "user":
         return "Use SuperGroup to download with User!"
     if session == "user":
-        messages = await client.userbot.copy_message(chat_id=bot_id, from_chat_id=messages.chat.id, message_id=messages.id)
+        messages = await client.userbot.copy_message(
+            chat_id=bot_id, from_chat_id=messages.chat.id, message_id=messages.id
+        )
     return messages if messages.media else "Link Provided not telegram media."
 
 
