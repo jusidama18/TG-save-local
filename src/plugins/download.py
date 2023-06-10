@@ -12,6 +12,7 @@ from src.utils.readable import HumanFormat
 
 logger = logging.getLogger(__name__)
 
+
 @Client.on_message(filters.private & filters.chat(OWNER_ID), group=1)
 async def download(client, message):
     start = datetime.now()
@@ -31,7 +32,7 @@ async def download(client, message):
                     mID=message.id,
                     prog_text="`Downloading This File!`",
                     file_name=file_name,
-                    extra_text = ({"Files": f"{index} / {len(messages)}"})
+                    extra_text=({"Files": f"{index} / {len(messages)}"}),
                 )
                 logger.info(f"Start Downloading : {file_name}")
                 output = await file.download(progress=prog.progress)
@@ -58,9 +59,13 @@ async def download(client, message):
         if prog.is_cancelled:
             if os.path.exists(output):
                 os.remove(output)
-            return await msg.edit(f"**Download [** `{file_name}` **] is cancelled in** `{dlTime}`")
-    
-        await msg.edit(f"**Finish Download in {dlTime} :** `{output}` **[{HumanFormat.ToBytes(os.stat(output).st_size)}]**")
+            return await msg.edit(
+                f"**Download [** `{file_name}` **] is cancelled in** `{dlTime}`"
+            )
+
+        await msg.edit(
+            f"**Finish Download in {dlTime} :** `{output}` **[{HumanFormat.ToBytes(os.stat(output).st_size)}]**"
+        )
     elif message.text.startswith(("https://t.me/", "tg://openmessage?user_id=")):
         msg = await message.reply("`Start Download File`")
         try:
@@ -99,9 +104,13 @@ async def download(client, message):
             if prog.is_cancelled:
                 if os.path.exists(output):
                     os.remove(output)
-                return await msg.edit(f"**Download [** `{file_name}` **] is cancelled in** `{dlTime}`")
-    
-            await msg.edit(f"**Finish Download in {dlTime} :** `{output}` **[{HumanFormat.ToBytes(os.stat(output).st_size)}]**")
+                return await msg.edit(
+                    f"**Download [** `{file_name}` **] is cancelled in** `{dlTime}`"
+                )
+
+            await msg.edit(
+                f"**Finish Download in {dlTime} :** `{output}` **[{HumanFormat.ToBytes(os.stat(output).st_size)}]**"
+            )
         else:
             await message.reply("Download what?")
     else:
@@ -123,6 +132,7 @@ async def cancel_download(_, query):
         await query.answer(
             "This Is Not Your Download. So, dont touch on this.", show_alert=True
         )
+
 
 @Client.on_message(filters.command("ls") & filters.user(OWNER_ID))
 async def ls(_, message):
@@ -151,4 +161,6 @@ async def ls(_, message):
     except errors.MessageTooLong:
         with BytesIO(text.encode()) as file:
             file.name = "File-List.txt"
-            return await message.reply_document(file, caption="File List Too Long.", quote=True)
+            return await message.reply_document(
+                file, caption="File List Too Long.", quote=True
+            )
