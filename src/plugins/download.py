@@ -34,8 +34,7 @@ async def filter_tg_link(client, message):
         and session != "user"
     ):
         return "Use SuperGroup to download with User!"
-    logger.info(messages)
-    return messages
+    return messages if messages.media else "Link Provided not telegram media."
 
 
 @Client.on_message(filters.private & filters.user(OWNER_ID), group=1)
@@ -147,7 +146,7 @@ async def ls(_, message):
         file_list = await listdir(basepath)
         file_list.sort()
         for entry in file_list:
-            fpath = await path.join(basepath, entry)
+            fpath = os.path.join(basepath, entry)
             if await path.isdir(fpath):
                 size = HumanFormat.ToBytes(HumanFormat.PathSize(fpath))
                 directory += f"\n📂 `{entry}` (`{size}`)"
