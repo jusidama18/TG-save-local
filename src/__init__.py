@@ -1,5 +1,4 @@
 import uvloop
-import pyromod
 
 from os import getenv, path
 
