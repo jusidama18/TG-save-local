@@ -89,5 +89,5 @@ async def cancel_download(_, query):
         await query.answer("Trying to cancel...", show_alert=True)
     else:
         await query.answer(
-            "This Is Not Your Download. So, dont touch on this...😡😡", show_alert=True
+            "This Is Not Your Download. So, dont touch on this.", show_alert=True
         )
