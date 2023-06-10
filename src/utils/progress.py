@@ -70,9 +70,9 @@ class Progress:
             await self.message.edit(
                 f"😔 Cancelled/ERROR: `{self.prog_text}` ({HumanFormat.ToBytes(total)})"
             )
-            await self._client.stop_transmission()
             _index = ProgressTask[self.chatID].index(self.mID)
             ProgressTask[self.chatID].pop(_index)
+            await self._client.stop_transmission()
 
 
         diff = now - self.start
