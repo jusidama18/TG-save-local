@@ -28,6 +28,7 @@ async def filter_tg_link(client, message):
     except ValueError as e:
         return e
 
+    logger.info(f"test, {session}")
     if client.userbot.me.is_premium and session != "bot" or session == "user":
         if (
             messages.chat.type.name not in ["SUPERGROUP", "CHANNEL"]
