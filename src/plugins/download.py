@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 @Client.on_message(filters.private & filters.user(OWNER_ID), group=1)
 async def download(client, message):
-    start = datetime.now()
+    start = datetime.now().timestamp()
     if message.media_group_id:
         messages = await message.get_media_group()
         msg = await message.reply(f"`Start Download {len(messages)} Files`")
