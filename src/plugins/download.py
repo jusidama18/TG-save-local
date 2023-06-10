@@ -1,8 +1,9 @@
+import os
 import logging
 import aiofiles
 
 from io import BytesIO
-from aiofiles.os import remove, path, stat, listdir, getcwd
+from aiofiles.os import remove, path, stat, listdir
 
 from datetime import datetime
 
@@ -125,9 +126,9 @@ async def cancel_download(_, query):
 async def ls(_, message):
     args = message.text.split(None, 1)
     basepath = (
-        f"{await getcwd()}/{args[1]}{'' if args[1].endswith('/') else '/'}"
+        f"{os.getcwd()}/{args[1]}{'' if args[1].endswith('/') else '/'}"
         if len(args) == 2
-        else f"{await getcwd()}/"
+        else f"{os.getcwd()}/"
     )
     directory, listfile = "", ""
     try:
