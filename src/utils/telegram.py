@@ -105,7 +105,7 @@ async def get_tg_link_content(link, bot: Client, user: Client = None):
         if not user_message.empty:
             return user_message, "user"
         raise ValueError("Private: Please report!")
-    elif not private:
+    if not private:
         return message, "bot"
     else:
         raise ValueError("Bot can't download from GROUPS without joining!")
