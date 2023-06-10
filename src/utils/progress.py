@@ -21,14 +21,14 @@ class Progress:
         self,
         message: Message,
         user: int,
-        client: Client= None,
+        client: Client = None,
         chatID: int = None,
         mID: int = None,
         prog_text: str = None,
         file_name: str = None,
         extra_text: dict = None,
         sleep_time: int = None,
-        wait: int = None
+        wait: int = None,
     ) -> None:
         self._cancelled: bool = False
         self.wait: int = wait or 15
@@ -41,7 +41,7 @@ class Progress:
         self.mID: int = mID or self.message.id
 
         self.start: int = datetime.now().timestamp()
-        self.extra_text: dict = extra_text        
+        self.extra_text: dict = extra_text
         self.sleep_time = sleep_time
         self.prog_text: str = prog_text
         self.file_name: str = file_name
@@ -86,7 +86,13 @@ class Progress:
                 round(percentage, 2),
             )
             if self.extra_text is not None and isinstance(self.extra_text, dict):
-                caption += "\n".join(f"**{key} :** `{value}`" for key, value in self.extra_text.items()) + "\n"
+                caption += (
+                    "\n".join(
+                        f"**{key} :** `{value}`"
+                        for key, value in self.extra_text.items()
+                    )
+                    + "\n"
+                )
             caption += "**Size :** `{0} / {1}`\n**ETA :** `{2}`\n".format(
                 HumanFormat.ToBytes(current),
                 HumanFormat.ToBytes(total),
@@ -100,6 +106,8 @@ class Progress:
             caption += f"**Speed :** `{HumanFormat.ToBytes((total - current) / (datetime.now().timestamp() - self.start))}/s`"
             caption += f"\n`{'=' * 50}`"
             with contextlib.suppress(MessageNotModified, MessageIdInvalid):
-                self.message = await self.message.edit(caption, reply_markup=reply_markup)
+                self.message = await self.message.edit(
+                    caption, reply_markup=reply_markup
+                )
             if self.sleep_time:
                 await sleep(self.sleep_time)
