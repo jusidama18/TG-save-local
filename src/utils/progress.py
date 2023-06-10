@@ -74,7 +74,6 @@ class Progress:
             ProgressTask[self.chatID].pop(_index)
             await self.client.stop_transmission()
 
-
         diff = now - self.start
         caption = f"`{'=' * 50}`\n{self.prog_text}\n\n"
         if round(diff % float(self.wait)) == 0 or current == total:
