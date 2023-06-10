@@ -36,7 +36,7 @@ async def download(client, message):
             mID=message.id,
             prog_text="`Downloading This File!`",
         )
-        file_data = getattr(message, file.media.value, None)
+        file_data = getattr(message, message.media.value, None)
         prog.file_name = (getattr(file_data, "file_name", None),)
         output = await file.download(progress=prog.progress)
         await msg.edit(f"**Finish Download :** `{output}`")
