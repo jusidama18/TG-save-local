@@ -1,5 +1,5 @@
 import os
-
+from datetime import datetime
 from io import BytesIO
 from pyrogram import Client, filters, errors
 
@@ -10,6 +10,7 @@ from src.utils.readable import HumanFormat
 
 @Client.on_message(filters.private, group=1)
 async def download(client, message):
+    start = datetime.now()
     if message.media_group_id:
         messages = await message.get_media_group()
         msg = await message.reply(f"`Start Download {len(messages)} Files`")
@@ -29,7 +30,9 @@ async def download(client, message):
                     extra_text = ({"Files": f"{index} / {len(messages)}"})
                 )
                 output = await file.download(progress=prog.progress)
-                text += f"**{index}.** `{output}`"
+                text += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes(os.stat(output).st_size)}]**"
+        dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
+        text += f"\n\n**Time Taken : {dlTime}**"
         await msg.edit(text)
     elif message.media and not message.empty:
         msg = await message.reply("`Start Download File`")
@@ -46,7 +49,13 @@ async def download(client, message):
         )
         
         output = await message.download(progress=prog.progress)
-        await msg.edit(f"**Finish Download :** `{output}`")
+        dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
+        if prog.is_cancelled:
+            if os.path.exists(output):
+                os.remove(output)
+            return await msg.edit(f"**Download [** `{file_name}` **] is cancelled in** `{dlTime}`")
+    
+        await msg.edit(f"**Finish Download in {dlTime} :** `{output}` **[{HumanFormat.ToBytes(os.stat(output).st_size)}]**")
     elif message.text.startswith(("https://t.me/", "tg://openmessage?user_id=")):
         msg = await message.reply("`Start Download File`")
         try:
@@ -80,11 +89,18 @@ async def download(client, message):
                 file_name=file_name,
             )
             
-            await messages.download(progress=prog.progress)
+            output = await messages.download(progress=prog.progress)
+            dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
+            if prog.is_cancelled:
+                if os.path.exists(output):
+                    os.remove(output)
+                return await msg.edit(f"**Download [** `{file_name}` **] is cancelled in** `{dlTime}`")
+    
+            await msg.edit(f"**Finish Download in {dlTime} :** `{output}` **[{HumanFormat.ToBytes(os.stat(output).st_size)}]**")
         else:
             await message.reply("Download what?")
     else:
-        return await message.reply("Send File or Telegram message of file link")
+        return await message.reply("`Send File or Telegram message of file link`")
 
 
 @Client.on_callback_query(
