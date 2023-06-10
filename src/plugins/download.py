@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 async def filter_tg_link(client, message):
+    bot_id = client.me.id
     try:
         messages, session = await get_tg_link_content(
             message.text, client, client.userbot
@@ -36,7 +37,7 @@ async def filter_tg_link(client, message):
     if session == "user":
         client = client.userbot
     messages = await client.get_messages(chat_id=messages.chat.id, message_ids=messages.id)
-    return await messages.copy(client.me.id)
+    return await messages.copy(bot_id)
 
 
 @Client.on_message(filters.private & filters.user(OWNER_ID), group=1)
