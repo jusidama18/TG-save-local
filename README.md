@@ -76,6 +76,15 @@ OWNER_ID="<user_id_allowed>"
 
     Please note that when deploying the bot to a public environment, make sure to secure sensitive information like API credentials and session strings. Consider using environment variables or a secure secret management system.
 
+## Notes:
+If you deploy with Docker / Docker-Compose and want to save to local folder you can do by two ways:
+(In this example folder for download path is `/home/user/downloads`)
+
+1. For Dockerfile, do `sudo docker run -v /home/user/downloads:/app/downloads myimage`.
+2. For Docker-Compose, edit this line [docker-compose.yml](https://github.com/jusidama18/TG-save-local/blob/main/docker-compose.yml#L12) to your download path.
+
+Don't change `/app/downloads` part since it's bot download path.
+
 ## Usage
 
 Run the bot using the following command:
