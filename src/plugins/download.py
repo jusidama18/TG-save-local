@@ -29,10 +29,7 @@ async def filter_tg_link(client, message):
     except ValueError as e:
         return e
 
-    if (
-        messages.chat.type.name not in ["SUPERGROUP", "CHANNEL"]
-        and session != "user"
-    ):
+    if messages.chat.type.name not in ["SUPERGROUP", "CHANNEL"] and session != "user":
         return "Use SuperGroup to download with User!"
     logger.info(messages)
     return messages
