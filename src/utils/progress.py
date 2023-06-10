@@ -68,7 +68,7 @@ class Progress:
 
         if self.is_cancelled:
             await self.message.edit(
-                f"😔 Cancelled/ERROR: `{self.prog_text}` [{self.file_name or 'NoNameFiles'}] ({HumanFormat.ToBytes(total)})"
+                f"😔 **Cancelled/ERROR: {self.prog_text} [** `{self.file_name or 'NoNameFiles'}` **] ({HumanFormat.ToBytes(total)})**"
             )
             _index = ProgressTask[self.chatID].index(self.mID)
             ProgressTask[self.chatID].pop(_index)

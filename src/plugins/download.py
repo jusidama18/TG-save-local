@@ -1,8 +1,10 @@
+import os
 import logging
 import aiofiles
 
 from io import BytesIO
-from aiofiles.os import remove, path, stat, listdir, getcwd
+from pathlib import Path
+from aiofiles.os import path, stat, listdir
 
 from datetime import datetime
 
@@ -43,8 +45,13 @@ async def filter_tg_link(client, message):
 
 @Client.on_message(filters.private & filters.user(OWNER_ID), group=1)
 async def download(client, message):
+    folder_name = None
+    download_dir = Path("downloads")
+    date = datetime.now().strftime("%Y-%m-%d %H:%M")
     start = datetime.now().timestamp()
     if message.media_group_id:
+        folder_name = f"TG-MediaGroup-{str(message.media_group_id)} [{date}]"
+        download_dir = download_dir.joinpath()
         messages = await message.get_media_group()
     elif message.media and not message.empty:
         if (file_ := message.document) and (file_.mime_type == "text/plain"):
@@ -71,7 +78,12 @@ async def download(client, message):
 
     msg = await message.reply(f"`Start Download {len(messages)} Files`")
     text = "**Finish Download :**\n"
-    allFinish = []
+    if len(messages) > 1 and not folder_name:
+        folder_name = f"TG-BatchDL-{message.id} [{date}]"
+
+    if folder_name:
+        download_dir = download_dir.joinpath(folder_name)
+    
     for index, file in enumerate(messages, start=1):
         if not isinstance(file, Message):
             o_file = file
@@ -79,6 +91,7 @@ async def download(client, message):
             if len(messages) > 1 and isinstance(file, str):
                 await msg.reply(f"{o_file} > `{file}`", quote=True)
                 continue
+
         if file.media and not file.empty:
             file_data = getattr(file, file.media.value, None)
             file_name = getattr(file_data, "file_name", None)
@@ -92,18 +105,17 @@ async def download(client, message):
                 file_name=file_name,
                 extra_text=({"Files": f"{index} / {len(messages)}"}),
             )
+            new_folder_dir = download_dir
+            if not folder_name:
+                new_folder_dir = new_folder_dir.joinpath(str(file.media.value))
+            
+            if file_name:
+                new_folder_dir = new_folder_dir.joinpath(file_name).absolute()
+            else:
+                new_folder_dir = f"{new_folder_dir.absolute()}/"
+            
             logger.info(f"Start Downloading : {file_name}")
-            output = await file.download(progress=prog.progress)
-            allFinish.append(output)
-            if prog.is_cancelled:
-                for fl in allFinish:
-                    if await path.exists(fl):
-                        await remove(fl)
-                text = f"**All Download is cancelled in** `{dlTime}`\n"
-                text += "\n".join(
-                    f"{index}. {name}" for index, name in enumerate(allFinish, start=1)
-                )
-                return await msg.edit(text)
+            output = await file.download(new_folder_dir, progress=prog.progress)
             text += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(path)).st_size)}]**"
     dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
     text += f"\n\n**Time Taken : {dlTime}**"
@@ -131,21 +143,21 @@ async def cancel_download(_, query):
 async def ls(_, message):
     args = message.text.split(None, 1)
     basepath = (
-        f"{await getcwd()}/{args[1]}{'' if args[1].endswith('/') else '/'}"
+        f"{os.getcwd()}/{args[1]}{'' if args[1].endswith('/') else '/'}"
         if len(args) == 2
-        else f"{await getcwd()}/"
+        else f"{os.getcwd()}/"
     )
     directory, listfile = "", ""
     try:
         file_list = await listdir(basepath)
         file_list.sort()
         for entry in file_list:
-            path = await path.join(basepath, entry)
-            if await path.isdir(path):
-                size = HumanFormat.ToBytes(HumanFormat.PathSize(path))
+            fpath = await path.join(basepath, entry)
+            if await path.isdir(fpath):
+                size = HumanFormat.ToBytes(HumanFormat.PathSize(fpath))
                 directory += f"\n📂 `{entry}` (`{size}`)"
-            if await path.isfile(path):
-                size = HumanFormat.ToBytes((await stat(path)).st_size)
+            if await path.isfile(fpath):
+                size = HumanFormat.ToBytes((await stat(fpath)).st_size)
                 listfile += f"\n📄 `{entry}` (`{size}`)"
         text = f"**Path :** `{basepath}`\n\n**List Directory :**{directory}\n\n**List File :**{listfile}"
         return await message.reply_text(text, quote=True)
