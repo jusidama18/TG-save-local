@@ -34,10 +34,10 @@ async def filter_tg_link(client, message):
         and session != "user"
     ):
         return "Use SuperGroup to download with User!"
-    if session == "user" or messages.from_user.is_bot:
+    if session == "user":
         client = client.userbot
     messages = await client.get_messages(chat_id=messages.chat.id, message_ids=messages.id)
-    return await messages.copy(bot_id)
+    return await messages.copy(bot_id) if messages.from_user.is_bot else messages
 
 
 @Client.on_message(filters.private & filters.user(OWNER_ID), group=1)
