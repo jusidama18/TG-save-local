@@ -1,4 +1,5 @@
 import uvloop
+import logging
 
 from os import getenv, path
 
@@ -9,6 +10,16 @@ uvloop.install()
 
 if path.exists("config.env"):
     load_dotenv("config.env", override=True)
+
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(funcName)s %(levelname)s : %(message)s",
+    handlers=[
+        logging.FileHandler("bot-log.txt", mode="w"),
+        logging.StreamHandler(),
+    ],
+    level=logging.INFO,
+    datefmt="%d/%b/%Y | %I:%M:%S %p",
+)
 
 api_id, api_hash = getenv("API_ID", default=6), getenv(
     "API_HASH", default="eb06d4abfb49dc3eeb1aeb98ae0f581e"
