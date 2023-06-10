@@ -74,6 +74,8 @@ async def download(client, message):
             await messages.download(progress=prog.progress)
         else:
             await message.reply("Download what?")
+    else:
+        return await message.reply("Send File or Telegram message of file link")
 
 
 @Client.on_callback_query(
