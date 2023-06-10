@@ -1,0 +1,12 @@
+version: "3.3"
+
+services:
+  app:
+    container_name: tg-save-local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python3 -m src
+    restart: on-failure
+    volumes:
+      - /home/ubuntu/downloads:/app/downloads

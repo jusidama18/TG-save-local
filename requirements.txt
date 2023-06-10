@@ -1,0 +1,8 @@
+uvloop
+
+pyrogram
+TgCrypto
+git+https://github.com/Jusidama-Bot/pyromod
+
+aiofiles
+python-dotenv
