@@ -28,20 +28,15 @@ async def filter_tg_link(client, message):
     except ValueError as e:
         return e
 
-    logger.info(f"test, {session}")
-    if client.userbot.me.is_premium and session != "bot" or session == "user":
-        if (
-            messages.chat.type.name not in ["SUPERGROUP", "CHANNEL"]
-            and session != "user"
-        ):
-            return "Use SuperGroup to download with User!"
-
-        messages = await client.userbot.get_messages(
-            chat_id=messages.chat.id, message_ids=messages.id
-        )
-        messages = await messages.copy(client.me.id)
-    else:
-        return "Download what?"
+    if (
+        messages.chat.type.name not in ["SUPERGROUP", "CHANNEL"]
+        and session != "user"
+    ):
+        return "Use SuperGroup to download with User!"
+    if session == "user":
+        client = client.userbot
+    messages = await client.get_messages(chat_id=messages.chat.id, message_ids=messages.id)
+    return await messages.copy(client.me.id)
 
 
 @Client.on_message(filters.private & filters.user(OWNER_ID), group=1)
