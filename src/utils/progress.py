@@ -71,6 +71,9 @@ class Progress:
                 f"😔 Cancelled/ERROR: `{self.prog_text}` ({HumanFormat.ToBytes(total)})"
             )
             await self._client.stop_transmission()
+            _index = ProgressTask[self.chatID].index(self.mID)
+            ProgressTask[self.chatID].pop(_index)
+
 
         diff = now - self.start
         caption = f"`{'=' * 50}`\n{self.prog_text}\n\n"
