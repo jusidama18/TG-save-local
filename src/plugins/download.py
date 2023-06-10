@@ -34,10 +34,7 @@ async def filter_tg_link(client, message):
         and session != "user"
     ):
         return "Use SuperGroup to download with User!"
-    if session == "user":
-        client = client.userbot
-    messages = await client.get_messages(chat_id=messages.chat.id, message_ids=messages.id)
-    return await messages.copy(bot_id) if messages.from_user.is_bot else messages
+    return messages
 
 
 @Client.on_message(filters.private & filters.user(OWNER_ID), group=1)
@@ -113,7 +110,7 @@ async def download(client, message):
 
             logger.info(f"Start Downloading : {file_name}")
             output = await file.download(new_folder_dir, progress=prog.progress)
-            text += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(path)).st_size)}]**"
+            text += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(output)).st_size)}]**"
     dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
     text += f"\n\n**Time Taken : {dlTime}**"
     await msg.edit(text)
