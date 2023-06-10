@@ -34,6 +34,7 @@ async def filter_tg_link(client, message):
         and session != "user"
     ):
         return "Use SuperGroup to download with User!"
+    logger.info(messages)
     return messages
 
 
