@@ -12,7 +12,7 @@ from src.utils.readable import HumanFormat
 
 logger = logging.getLogger(__name__)
 
-@Client.on_message(filters.private, group=1)
+@Client.on_message(filters.private & filters.chat(OWNER_ID), group=1)
 async def download(client, message):
     start = datetime.now()
     if message.media_group_id:
@@ -124,7 +124,7 @@ async def cancel_download(_, query):
             "This Is Not Your Download. So, dont touch on this.", show_alert=True
         )
 
-@Client.on_message(filters.command("ls"))
+@Client.on_message(filters.command("ls") & filters.user(OWNER_ID))
 async def ls(_, message):
     args = message.text.split(None, 1)
     basepath = (
