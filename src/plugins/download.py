@@ -38,7 +38,7 @@ async def download(client, message):
         )
         file_data = getattr(message, message.media.value, None)
         prog.file_name = (getattr(file_data, "file_name", None),)
-        output = await file.download(progress=prog.progress)
+        output = await message.download(progress=prog.progress)
         await msg.edit(f"**Finish Download :** `{output}`")
     elif message.text.startswith(("https://t.me/", "tg://openmessage?user_id=")):
         msg = await message.reply("`Start Download File`")
