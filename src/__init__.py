@@ -49,3 +49,5 @@ if session_string is not None:
     app.userbot.start()
 else:
     app.userbot = None
+
+OWNER_ID = str(getenv("OWNER_ID", "")).split()

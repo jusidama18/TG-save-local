@@ -1,30 +1,52 @@
-from pyrogram import Client, filters
+import os
+import logging
 
+from datetime import datetime
+from io import BytesIO
+from pyrogram import Client, filters, errors
+
+from src import OWNER_ID
 from src.utils.progress import Progress, ProgressTask
 from src.utils.telegram import get_tg_link_content  # , extract_bulk_links
+from src.utils.readable import HumanFormat
 
+logger = logging.getLogger(__name__)
 
-@Client.on_message(filters.private)
+@Client.on_message(filters.private & filters.user(OWNER_ID), group=1)
 async def download(client, message):
+    start = datetime.now()
     if message.media_group_id:
         messages = await message.get_media_group()
         msg = await message.reply(f"`Start Download {len(messages)} Files`")
-        prog = Progress(
-            message=msg,
-            user=message.from_user.id,
-            client=client,
-            chatID=message.chat.id,
-            mID=message.id,
-            prog_text="`Downloading This File!`",
-        )
         text = "**Finish Download :**\n"
+        allFinish = []
         for index, file in enumerate(messages, start=1):
             if not file.empty:
                 file_data = getattr(file, file.media.value, None)
-                prog.file_name = (getattr(file_data, "file_name", None),)
-                prog.extra_text = ({"Files": f"{index} / {len(messages)}"},)
+                file_name = (getattr(file_data, "file_name", None),)
+                prog = Progress(
+                    message=msg,
+                    user=message.from_user.id,
+                    client=client,
+                    chatID=message.chat.id,
+                    mID=message.id,
+                    prog_text="`Downloading This File!`",
+                    file_name=file_name,
+                    extra_text = ({"Files": f"{index} / {len(messages)}"})
+                )
+                logger.info(f"Start Downloading : {file_name}")
                 output = await file.download(progress=prog.progress)
-                text += f"**{index}.** `{output}`"
+                allFinish.append(output)
+                if prog.is_cancelled:
+                    for fl in allFinish:
+                        if os.path.exists(fl):
+                            os.remove(fl)
+                    text = f"**All Download is cancelled in** `{dlTime}`\n"
+                    text += "\n".join(f"{index}. {name}" for index, name in enumerate(allFinish, start=1))
+                    return await msg.edit(text)
+                text += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes(os.stat(output).st_size)}]**"
+        dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
+        text += f"\n\n**Time Taken : {dlTime}**"
         await msg.edit(text)
     elif message.media and not message.empty:
         msg = await message.reply("`Start Download File`")
@@ -40,8 +62,16 @@ async def download(client, message):
             file_name=file_name,
         )
 
+        logger.info(f"Start Downloading : {file_name}")
+
         output = await message.download(progress=prog.progress)
-        await msg.edit(f"**Finish Download :** `{output}`")
+        dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
+        if prog.is_cancelled:
+            if os.path.exists(output):
+                os.remove(output)
+            return await msg.edit(f"**Download [** `{file_name}` **] is cancelled in** `{dlTime}`")
+    
+        await msg.edit(f"**Finish Download in {dlTime} :** `{output}` **[{HumanFormat.ToBytes(os.stat(output).st_size)}]**")
     elif message.text.startswith(("https://t.me/", "tg://openmessage?user_id=")):
         msg = await message.reply("`Start Download File`")
         try:
@@ -63,6 +93,8 @@ async def download(client, message):
             )
             messages = await messages.copy(client.me.id)
         if messages.media and not messages.empty:
+            file_data = getattr(messages, messages.media.value, None)
+            file_name = (getattr(file_data, "file_name", None),)
             prog = Progress(
                 message=msg,
                 user=message.from_user.id,
@@ -70,14 +102,21 @@ async def download(client, message):
                 chatID=message.chat.id,
                 mID=message.id,
                 prog_text="`Downloading This File!`",
+                file_name=file_name,
             )
-            file_data = getattr(messages, messages.media.value, None)
-            prog.file_name = (getattr(file_data, "file_name", None),)
-            await messages.download(progress=prog.progress)
+            logger.info(f"Start Downloading : {file_name}")
+            output = await messages.download(progress=prog.progress)
+            dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
+            if prog.is_cancelled:
+                if os.path.exists(output):
+                    os.remove(output)
+                return await msg.edit(f"**Download [** `{file_name}` **] is cancelled in** `{dlTime}`")
+    
+            await msg.edit(f"**Finish Download in {dlTime} :** `{output}` **[{HumanFormat.ToBytes(os.stat(output).st_size)}]**")
         else:
             await message.reply("Download what?")
     else:
-        return await message.reply("Send File or Telegram message of file link")
+        return await message.reply("`Send File or Telegram message of file link`")
 
 
 @Client.on_callback_query(
@@ -95,3 +134,32 @@ async def cancel_download(_, query):
         await query.answer(
             "This Is Not Your Download. So, dont touch on this.", show_alert=True
         )
+
+@Client.on_message(filters.command("ls") & filters.user(OWNER_ID))
+async def ls(_, message):
+    args = message.text.split(None, 1)
+    basepath = (
+        f"{os.getcwd()}/{args[1]}{'' if args[1].endswith('/') else '/'}"
+        if len(args) == 2
+        else f"{os.getcwd()}/"
+    )
+    directory, listfile = "", ""
+    try:
+        file_list = os.listdir(basepath)
+        file_list.sort()
+        for entry in file_list:
+            path = os.path.join(basepath, entry)
+            if os.path.isdir(path):
+                size = HumanFormat.ToBytes(HumanFormat.PathSize(path))
+                directory += f"\n📂 `{entry}` (`{size}`)"
+            if os.path.isfile(path):
+                size = HumanFormat.ToBytes(os.stat(path).st_size)
+                listfile += f"\n📄 `{entry}` (`{size}`)"
+        text = f"**Path :** `{basepath}`\n\n**List Directory :**{directory}\n\n**List File :**{listfile}"
+        return await message.reply_text(text, quote=True)
+    except FileNotFoundError:
+        return await message.reply_text("`File/Folder Not Found.`", quote=True)
+    except errors.MessageTooLong:
+        with BytesIO(text.encode()) as file:
+            file.name = "File-List.txt"
+            return await message.reply_document(file, caption="File List Too Long.", quote=True)

@@ -1,3 +1,5 @@
+import os
+
 from typing import Union
 
 SIZE_UNITS = {
@@ -60,6 +62,17 @@ class HumanFormat:
             size = size * ((index - (len(SIZE_UNITS) - 1)) * (2**10))
             real_size = f"{str(round(size, 2))} {SIZE_UNITS[-1]}"
         return real_size
+
+    @staticmethod
+    def PathSize(path: str) -> int:
+        if os.path.isfile(path):
+            return os.path.getsize(path)
+        total_size = 0
+        for root, _, files in os.walk(path):
+            for f in files:
+                abs_path = os.path.join(root, f)
+                total_size += os.path.getsize(abs_path)
+        return total_size
 
     @staticmethod
     def Time(milliseconds: int, milli: bool = False, units: str = None) -> str:

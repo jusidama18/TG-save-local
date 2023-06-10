@@ -72,8 +72,7 @@ class Progress:
             )
             _index = ProgressTask[self.chatID].index(self.mID)
             ProgressTask[self.chatID].pop(_index)
-            await self._client.stop_transmission()
-
+            await self.client.stop_transmission()
 
         diff = now - self.start
         caption = f"`{'=' * 50}`\n{self.prog_text}\n\n"
