@@ -1,10 +1,14 @@
-from pyrogram import Client, filters
+import os
+
+from io import BytesIO
+from pyrogram import Client, filters, errors
 
 from src.utils.progress import Progress, ProgressTask
 from src.utils.telegram import get_tg_link_content  # , extract_bulk_links
+from src.utils.readable import HumanFormat
 
 
-@Client.on_message(filters.private)
+@Client.on_message(filters.private, group=1)
 async def download(client, message):
     if message.media_group_id:
         messages = await message.get_media_group()
@@ -98,3 +102,32 @@ async def cancel_download(_, query):
         await query.answer(
             "This Is Not Your Download. So, dont touch on this.", show_alert=True
         )
+
+@Client.on_message(filters.command("ls"))
+async def ls(_, message):
+    args = message.text.split(None, 1)
+    basepath = (
+        f"{os.getcwd()}/{args[1]}{'' if args[1].endswith('/') else '/'}"
+        if len(args) == 2
+        else f"{os.getcwd()}/"
+    )
+    directory, listfile = "", ""
+    try:
+        file_list = os.listdir(basepath)
+        file_list.sort()
+        for entry in file_list:
+            path = os.path.join(basepath, entry)
+            if os.path.isdir(path):
+                size = HumanFormat.ToBytes(HumanFormat.PathSize(path))
+                directory += f"\n📂 `{entry}` (`{size}`)"
+            if os.path.isfile(path):
+                size = HumanFormat.ToBytes(os.stat(path).st_size)
+                listfile += f"\n📄 `{entry}` (`{size}`)"
+        text = f"**Path :** `{basepath}`\n\n**List Directory :**{directory}\n\n**List File :**{listfile}"
+        return await message.reply_text(text, quote=True)
+    except FileNotFoundError:
+        return await message.reply_text("`File/Folder Not Found.`", quote=True)
+    except errors.MessageTooLong:
+        with BytesIO(text.encode()) as file:
+            file.name = "File-List.txt"
+            return await message.reply_document(file, caption="File List Too Long.", quote=True)
