@@ -83,7 +83,7 @@ async def download(client, message):
 
     if folder_name:
         download_dir = download_dir.joinpath(folder_name)
-    
+
     for index, file in enumerate(messages, start=1):
         if not isinstance(file, Message):
             o_file = file
@@ -108,12 +108,12 @@ async def download(client, message):
             new_folder_dir = download_dir
             if not folder_name:
                 new_folder_dir = new_folder_dir.joinpath(str(file.media.value))
-            
+
             if file_name:
                 new_folder_dir = new_folder_dir.joinpath(file_name).absolute()
             else:
                 new_folder_dir = f"{new_folder_dir.absolute()}/"
-            
+
             logger.info(f"Start Downloading : {file_name}")
             output = await file.download(new_folder_dir, progress=prog.progress)
             text += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(path)).st_size)}]**"
