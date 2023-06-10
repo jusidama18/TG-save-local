@@ -135,12 +135,12 @@ async def ls(_, message):
         file_list = await listdir(basepath)
         file_list.sort()
         for entry in file_list:
-            path = await path.join(basepath, entry)
-            if await path.isdir(path):
-                size = HumanFormat.ToBytes(HumanFormat.PathSize(path))
+            fpath = await path.join(basepath, entry)
+            if await path.isdir(fpath):
+                size = HumanFormat.ToBytes(HumanFormat.PathSize(fpath))
                 directory += f"\n📂 `{entry}` (`{size}`)"
-            if await path.isfile(path):
-                size = HumanFormat.ToBytes((await stat(path)).st_size)
+            if await path.isfile(fpath):
+                size = HumanFormat.ToBytes((await stat(fpath)).st_size)
                 listfile += f"\n📄 `{entry}` (`{size}`)"
         text = f"**Path :** `{basepath}`\n\n**List Directory :**{directory}\n\n**List File :**{listfile}"
         return await message.reply_text(text, quote=True)
