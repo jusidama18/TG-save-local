@@ -49,7 +49,7 @@ async def download(client, message):
     date = datetime.now().strftime("%Y-%m-%d %H:%M")
     start = datetime.now().timestamp()
     if message.media_group_id:
-        folder_name = f"TG-MediaGroup-{str(message.media_group_id)}"
+        folder_name = f"TG-MediaGroup-{str(message.media_group_id)} [{date}]"
         download_dir = download_dir.joinpath()
         messages = await message.get_media_group()
     elif message.media and not message.empty:
@@ -74,7 +74,7 @@ async def download(client, message):
     text = "**Finish Download :**\n"
     if len(messages) > 1 and not folder_name:
         folder_name = f"TG-BatchDL-{message.id} [{date}]"
-    
+
     if folder_name:
         download_dir = download_dir.joinpath(folder_name)
     
@@ -99,6 +99,10 @@ async def download(client, message):
                 file_name=file_name,
                 extra_text=({"Files": f"{index} / {len(messages)}"}),
             )
+            
+            if not folder_name:
+                download_dir = download_dir.joinpath(str(file.media.value))
+    
             download_dir = download_dir.joinpath(file_name)
             logger.info(f"Start Downloading : {file_name}")
             output = await file.download(download_dir, progress=prog.progress)
