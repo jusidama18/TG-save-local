@@ -10,7 +10,7 @@ Before running the Telegram File Downloader Bot, you need to set up your environ
 
 - `API_ID`: Your Telegram API ID. You can obtain it by creating a new application on the [Telegram website](https://my.telegram.org/apps).
 - `API_HASH`: Your Telegram API hash. This is also provided when you create a new application on the Telegram website.
-- `SESSION_STRING`: The Pyrogram session string. You can generate it by running the [Pyrogram session creation script](https://docs.pyrogram.org/start/Project-Setup#api-id-api-hash).
+- `SESSION_STRING`: The Pyrogram session string. You can generate it by running the `python3 session_generate.py`.
 - `BOT_TOKEN`: The Telegram Bot token. You can create a new bot and obtain the token by talking to the [BotFather](https://core.telegram.org/bots#botfather).
 
 Once you have the required information, create a `.env` file in the project directory and populate it with the environment variables:
