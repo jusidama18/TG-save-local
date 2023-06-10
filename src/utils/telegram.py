@@ -63,7 +63,7 @@ async def extract_bulk_links(message, bulk_start: int = None, bulk_end: int = No
         and (file_.mime_type == "text/plain")
     ):
         return await get_links_from_file(message.reply_to_message, bulk_start, bulk_end)
-    elif text := message.reply_to_message.text:
+    if text := message.reply_to_message.text:
         return await get_links_from_message(text, bulk_start, bulk_end)
     return []
 
@@ -104,8 +104,7 @@ async def get_tg_link_content(link, bot: Client, user: Client = None):
                 f"You don't have access to this chat!. ERROR: {e}") from e
         if not user_message.empty:
             return user_message, "user"
-        else:
-            raise ValueError("Private: Please report!")
+        raise ValueError("Private: Please report!")
     elif not private:
         return message, "bot"
     else:
