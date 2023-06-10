@@ -26,7 +26,7 @@ async def download(client, message):
                 output = await file.download(progress=prog.progress)
                 text += f"**{index}.** `{output}`"
         await msg.edit(text)
-    elif message.media and not messages.empty:
+    elif message.media and not message.empty:
         msg = await message.reply("`Start Download File`")
         prog = Progress(
             message=msg,
