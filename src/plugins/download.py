@@ -46,6 +46,7 @@ async def filter_tg_link(client, message):
 async def download(client, message):
     folder_name = None
     download_dir = Path("downloads")
+    date = datetime.now().strftime("%Y-%m-%d %H:%M")
     start = datetime.now().timestamp()
     if message.media_group_id:
         folder_name = f"TG-MediaGroup-{str(message.media_group_id)}"
@@ -72,7 +73,6 @@ async def download(client, message):
     msg = await message.reply(f"`Start Download {len(messages)} Files`")
     text = "**Finish Download :**\n"
     if len(messages) > 1 and not folder_name:
-        date = datetime.now().strftime("%Y-%m-%d %H:%M")
         folder_name = f"TG-BatchDL-{message.id} [{date}]"
     
     if folder_name:
