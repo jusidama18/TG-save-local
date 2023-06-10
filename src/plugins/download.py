@@ -10,7 +10,7 @@ from datetime import datetime
 
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from pyrogram.errors import MessageTooLong
+from pyrogram.errors import MessageTooLong, PeerIdInvalid
 
 from src import OWNER_ID
 from src.utils.progress import Progress, ProgressTask
@@ -35,7 +35,11 @@ async def filter_tg_link(client, message):
     ):
         return "Use SuperGroup to download with User!"
     if session == "user":
-        messages = await client.userbot.copy_message(chat_id=bot_id, from_chat_id=messages.chat.id, message_id=messages.id)
+        try:
+            messages = await client.userbot.copy_message(chat_id=bot_id, from_chat_id=messages.chat.id, message_id=messages.id)
+        except PeerIdInvalid:
+            await client.userbot.send_message(bot_id, "/start")
+            messages = await client.userbot.copy_message(chat_id=bot_id, from_chat_id=messages.chat.id, message_id=messages.id)
     return messages if messages.media else "Link Provided not telegram media."
 
 
