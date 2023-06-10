@@ -3,6 +3,7 @@ import logging
 import aiofiles
 
 from io import BytesIO
+from pathlib import Path
 from aiofiles.os import path, stat, listdir
 
 from datetime import datetime
@@ -43,8 +44,12 @@ async def filter_tg_link(client, message):
 
 @Client.on_message(filters.private & filters.user(OWNER_ID), group=1)
 async def download(client, message):
+    folder_name = None
+    download_dir = Path("downloads")
     start = datetime.now().timestamp()
     if message.media_group_id:
+        folder_name = f"TG-MediaGroup-{str(message.media_group_id)}"
+        download_dir = download_dir.joinpath()
         messages = await message.get_media_group()
     elif message.media and not message.empty:
         if (file_ := message.document) and (file_.mime_type == "text/plain"):
@@ -66,6 +71,13 @@ async def download(client, message):
 
     msg = await message.reply(f"`Start Download {len(messages)} Files`")
     text = "**Finish Download :**\n"
+    if len(messages) > 1 and not folder_name:
+        date = datetime.now().strftime("%Y-%m-%d %H:%M")
+        folder_name = f"TG-BatchDL-{message.id} [{date}]"
+    
+    if folder_name:
+        download_dir = download_dir.joinpath(folder_name)
+    
     for index, file in enumerate(messages, start=1):
         if not isinstance(file, Message):
             o_file = file
@@ -73,6 +85,7 @@ async def download(client, message):
             if len(messages) > 1 and isinstance(file, str):
                 await msg.reply(f"{o_file} > `{file}`", quote=True)
                 continue
+
         if file.media and not file.empty:
             file_data = getattr(file, file.media.value, None)
             file_name = getattr(file_data, "file_name", None)
@@ -86,8 +99,9 @@ async def download(client, message):
                 file_name=file_name,
                 extra_text=({"Files": f"{index} / {len(messages)}"}),
             )
+            download_dir = download_dir.joinpath(file_name)
             logger.info(f"Start Downloading : {file_name}")
-            output = await file.download(progress=prog.progress)
+            output = await file.download(download_dir, progress=prog.progress)
             text += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(path)).st_size)}]**"
     dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
     text += f"\n\n**Time Taken : {dlTime}**"
