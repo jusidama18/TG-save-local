@@ -24,7 +24,7 @@ async def download(client, message):
         for index, file in enumerate(messages, start=1):
             if not file.empty:
                 file_data = getattr(file, file.media.value, None)
-                file_name = (getattr(file_data, "file_name", None),)
+                file_name = getattr(file_data, "file_name", None)
                 prog = Progress(
                     message=msg,
                     user=message.from_user.id,
@@ -55,7 +55,7 @@ async def download(client, message):
     elif message.media and not message.empty:
         msg = await message.reply("`Start Download File`")
         file_data = getattr(message, message.media.value, None)
-        file_name = (getattr(file_data, "file_name", None),)
+        file_name = getattr(file_data, "file_name", None)
         prog = Progress(
             message=msg,
             user=message.from_user.id,
@@ -102,7 +102,7 @@ async def download(client, message):
             messages = await messages.copy(client.me.id)
         if messages.media and not messages.empty:
             file_data = getattr(messages, messages.media.value, None)
-            file_name = (getattr(file_data, "file_name", None),)
+            file_name = getattr(file_data, "file_name", None)
             prog = Progress(
                 message=msg,
                 user=message.from_user.id,
