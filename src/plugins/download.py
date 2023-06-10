@@ -1,12 +1,16 @@
 import os
+import logging
+
 from datetime import datetime
 from io import BytesIO
 from pyrogram import Client, filters, errors
 
+from src import OWNER_ID
 from src.utils.progress import Progress, ProgressTask
 from src.utils.telegram import get_tg_link_content  # , extract_bulk_links
 from src.utils.readable import HumanFormat
 
+logger = logging.getLogger(__name__)
 
 @Client.on_message(filters.private, group=1)
 async def download(client, message):
@@ -29,6 +33,7 @@ async def download(client, message):
                     file_name=file_name,
                     extra_text = ({"Files": f"{index} / {len(messages)}"})
                 )
+                logger.info(f"Start Downloading : {file_name}")
                 output = await file.download(progress=prog.progress)
                 text += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes(os.stat(output).st_size)}]**"
         dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
@@ -47,7 +52,7 @@ async def download(client, message):
             prog_text="`Downloading This File!`",
             file_name=file_name,
         )
-        
+        logger.info(f"Start Downloading : {file_name}")
         output = await message.download(progress=prog.progress)
         dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
         if prog.is_cancelled:
@@ -88,7 +93,7 @@ async def download(client, message):
                 prog_text="`Downloading This File!`",
                 file_name=file_name,
             )
-            
+            logger.info(f"Start Downloading : {file_name}")
             output = await messages.download(progress=prog.progress)
             dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
             if prog.is_cancelled:
