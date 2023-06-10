@@ -101,7 +101,8 @@ async def download(client, message):
             )
             
             if not folder_name:
-                download_dir = download_dir.joinpath(str(file.media.value))
+                folder_name = str(file.media.value)
+                download_dir = download_dir.joinpath(folder_name)
     
             download_dir = download_dir.joinpath(file_name)
             logger.info(f"Start Downloading : {file_name}")
