@@ -17,6 +17,7 @@ from src.utils.readable import HumanFormat
 
 logger = logging.getLogger(__name__)
 
+
 async def filter_tg_link(client, message):
     try:
         messages, session = await get_tg_link_content(
@@ -51,8 +52,13 @@ async def download(client, message):
             text_file_dir = await message.download()
             async with aiofiles.open(text_file_dir, "r+") as f:
                 lines = await f.readlines()
-                links_list.extend(line.strip() for line in lines if len(line) != 0)
-            messages = [line for line in links_list if line.startswith(("https://t.me/", "tg://openmessage?user_id="))]
+                links_list.extend(line.strip()
+                                  for line in lines if len(line) != 0)
+            messages = [
+                line
+                for line in links_list
+                if line.startswith(("https://t.me/", "tg://openmessage?user_id="))
+            ]
         else:
             messages = [message]
     elif message.text.startswith(("https://t.me/", "tg://openmessage?user_id=")):
@@ -95,14 +101,14 @@ async def download(client, message):
                         await remove(fl)
                 text = f"**All Download is cancelled in** `{dlTime}`\n"
                 text += "\n".join(
-                    f"{index}. {name}"
-                    for index, name in enumerate(allFinish, start=1)
+                    f"{index}. {name}" for index, name in enumerate(allFinish, start=1)
                 )
                 return await msg.edit(text)
             text += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(path)).st_size)}]**"
     dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
     text += f"\n\n**Time Taken : {dlTime}**"
     await msg.edit(text)
+
 
 @Client.on_callback_query(
     filters.regex(r"^progress (?P<chatID>-?\d+) (?P<mID>\d+) (?P<user>\d+)")
