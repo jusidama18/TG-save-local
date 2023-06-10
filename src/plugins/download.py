@@ -19,6 +19,7 @@ from src.utils.readable import HumanFormat
 
 logger = logging.getLogger(__name__)
 
+
 async def filter_tg_link(client, message):
     try:
         messages, session = await get_tg_link_content(
@@ -58,8 +59,13 @@ async def download(client, message):
             text_file_dir = await message.download()
             async with aiofiles.open(text_file_dir, "r+") as f:
                 lines = await f.readlines()
-                links_list.extend(line.strip() for line in lines if len(line) != 0)
-            messages = [line for line in links_list if line.startswith(("https://t.me/", "tg://openmessage?user_id="))]
+                links_list.extend(line.strip()
+                                  for line in lines if len(line) != 0)
+            messages = [
+                line
+                for line in links_list
+                if line.startswith(("https://t.me/", "tg://openmessage?user_id="))
+            ]
         else:
             messages = [message]
     elif message.text.startswith(("https://t.me/", "tg://openmessage?user_id=")):
@@ -77,7 +83,7 @@ async def download(client, message):
 
     if folder_name:
         download_dir = download_dir.joinpath(folder_name)
-    
+
     for index, file in enumerate(messages, start=1):
         if not isinstance(file, Message):
             o_file = file
@@ -102,18 +108,19 @@ async def download(client, message):
             new_folder_dir = download_dir
             if not folder_name:
                 new_folder_dir = new_folder_dir.joinpath(str(file.media.value))
-            
+
             if file_name:
                 new_folder_dir = new_folder_dir.joinpath(file_name).absolute()
             else:
                 new_folder_dir = f"{new_folder_dir.absolute()}/"
-            
+
             logger.info(f"Start Downloading : {file_name}")
             output = await file.download(new_folder_dir, progress=prog.progress)
             text += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(path)).st_size)}]**"
     dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
     text += f"\n\n**Time Taken : {dlTime}**"
     await msg.edit(text)
+
 
 @Client.on_callback_query(
     filters.regex(r"^progress (?P<chatID>-?\d+) (?P<mID>\d+) (?P<user>\d+)")
