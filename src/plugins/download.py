@@ -9,20 +9,21 @@ async def download(client, message):
     if message.media_group_id:
         messages = await message.get_media_group()
         msg = await message.reply(f"`Start Download {len(messages)} Files`")
-        prog = Progress(
-            message=msg,
-            user=message.from_user.id,
-            client=client,
-            chatID=message.chat.id,
-            mID=message.id,
-            prog_text="`Downloading This File!`",
-        )
         text = "**Finish Download :**\n"
         for index, file in enumerate(messages, start=1):
             if not file.empty:
                 file_data = getattr(file, file.media.value, None)
-                prog.file_name = (getattr(file_data, "file_name", None),)
-                prog.extra_text = ({"Files": f"{index} / {len(messages)}"},)
+                file_name = (getattr(file_data, "file_name", None),)
+                prog = Progress(
+                    message=msg,
+                    user=message.from_user.id,
+                    client=client,
+                    chatID=message.chat.id,
+                    mID=message.id,
+                    prog_text="`Downloading This File!`",
+                    file_name=file_name,
+                    extra_text = ({"Files": f"{index} / {len(messages)}"})
+                )
                 output = await file.download(progress=prog.progress)
                 text += f"**{index}.** `{output}`"
         await msg.edit(text)
@@ -63,6 +64,8 @@ async def download(client, message):
             )
             messages = await messages.copy(client.me.id)
         if messages.media and not messages.empty:
+            file_data = getattr(messages, messages.media.value, None)
+            file_name = (getattr(file_data, "file_name", None),)
             prog = Progress(
                 message=msg,
                 user=message.from_user.id,
@@ -70,9 +73,9 @@ async def download(client, message):
                 chatID=message.chat.id,
                 mID=message.id,
                 prog_text="`Downloading This File!`",
+                file_name=file_name,
             )
-            file_data = getattr(messages, messages.media.value, None)
-            prog.file_name = (getattr(file_data, "file_name", None),)
+            
             await messages.download(progress=prog.progress)
         else:
             await message.reply("Download what?")
