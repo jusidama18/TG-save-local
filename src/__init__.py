@@ -34,6 +34,7 @@ userbot = Client(
     api_id=api_id,
     api_hash=api_hash,
     session_string=session_string,
+    sleep_threshold=10,
     max_concurrent_transmissions=1000,
 )
 
@@ -43,6 +44,7 @@ app = Client(
     api_hash=api_hash,
     bot_token=getenv("BOT_TOKEN", default=None),
     max_concurrent_transmissions=1000,
+    sleep_threshold=10,
     plugins=dict(root="src/plugins"),
 )
 
