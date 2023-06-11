@@ -75,8 +75,9 @@ async def download(client, message):
     else:
         return await message.reply("`Send File or Telegram message of file link`")
 
+    if not messages:
+        return
     msg = await message.reply(f"`Start Download {len(messages)} Files`")
-    header = "**Finish Download :**\n"
     if len(messages) > 1 and not folder_name:
         folder_name = f"TG-BatchDL-{message.id} [{date}]"
 
@@ -121,6 +122,7 @@ async def download(client, message):
     dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
     footer = f"\n\n**Time Taken : {dlTime}**"
     if body != "":
+        header = "**Finish Download :**\n"
         await msg.edit(header + body + footer)
 
 
