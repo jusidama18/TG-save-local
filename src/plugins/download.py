@@ -27,10 +27,10 @@ async def filter_tg_link(client, text):
     try:
         messages, session = await get_tg_link_content(text, client, client.userbot)
     except ValueError as e:
-        return e, should_del
+        return (e, should_del)
 
     if messages.chat.type.name not in ["SUPERGROUP", "CHANNEL"] and session != "user":
-        return "Use SuperGroup to download with User!", should_del
+        return ("Use SuperGroup to download with User!", should_del)
     
     if session == "user":
         messages = await client.userbot.copy_message(
@@ -38,7 +38,7 @@ async def filter_tg_link(client, text):
         )
         should_del = True
 
-    return messages, should_del if messages.media else "Link Provided not telegram media.", False
+    return (messages, should_del) if messages.media else ("Link Provided not telegram media.", False)
 
 
 @Client.on_message(filters.private & filters.user(OWNER_ID), group=1)
