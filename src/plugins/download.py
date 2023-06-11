@@ -1,6 +1,7 @@
 import os
 import logging
 import aiofiles
+import asyncio
 
 from io import BytesIO
 from pathlib import Path
@@ -123,6 +124,7 @@ async def download(client, message):
             logger.info(f"Start Downloading : {file_name}")
             output = await file.download(new_folder_dir, progress=prog.progress)
             text += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(output)).st_size)}]**"
+            await asyncio.sleep(0.5)
     dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
     text += f"\n\n**Time Taken : {dlTime}**"
     await msg.edit(text)
