@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 async def filter_tg_link(client, message):
-    bot_id = client.me.id
+    bot_id = client.me.username
     try:
         messages, session = await get_tg_link_content(
             message.text, client, client.userbot
