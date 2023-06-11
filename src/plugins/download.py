@@ -11,11 +11,11 @@ from datetime import datetime
 
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from pyrogram.errors import MessageTooLong, PeerIdInvalid
+from pyrogram.errors import MessageTooLong
 
 from src import OWNER_ID
 from src.utils.progress import Progress, ProgressTask
-from src.utils.telegram import get_tg_link_content  # , extract_bulk_links
+from src.utils.telegram import get_tg_link_content
 from src.utils.readable import HumanFormat
 
 logger = logging.getLogger(__name__)
