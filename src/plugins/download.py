@@ -97,40 +97,43 @@ async def download(client, message):
                 if len(messages) > 1 and isinstance(file, str):
                     await msg.reply(f"{o_file} > `{file}`", quote=True)
                     continue
+            try:
+                if not file.empty and file.media:
+                    file_data = getattr(file, file.media.value, None)
+                    file_name = getattr(file_data, "file_name", None)
+                    prog = Progress(
+                        message=msg,
+                        user=message.from_user.id,
+                        client=client,
+                        chatID=message.chat.id,
+                        mID=message.id,
+                        prog_text="`Downloading This File!`",
+                        file_name=file_name,
+                        extra_text=({"Files": f"{index} / {len(messages)}"}),
+                    )
+                    new_folder_dir = download_dir
+                    if not folder_name:
+                        new_folder_dir = new_folder_dir.joinpath(str(file.media.value))
 
-            if not file.empty and file.media:
-                file_data = getattr(file, file.media.value, None)
-                file_name = getattr(file_data, "file_name", None)
-                prog = Progress(
-                    message=msg,
-                    user=message.from_user.id,
-                    client=client,
-                    chatID=message.chat.id,
-                    mID=message.id,
-                    prog_text="`Downloading This File!`",
-                    file_name=file_name,
-                    extra_text=({"Files": f"{index} / {len(messages)}"}),
-                )
-                new_folder_dir = download_dir
-                if not folder_name:
-                    new_folder_dir = new_folder_dir.joinpath(str(file.media.value))
+                    if file_name:
+                        new_folder_dir = new_folder_dir.joinpath(file_name).absolute()
+                    else:
+                        new_folder_dir = f"{new_folder_dir.absolute()}/"
 
-                if file_name:
-                    new_folder_dir = new_folder_dir.joinpath(file_name).absolute()
-                else:
-                    new_folder_dir = f"{new_folder_dir.absolute()}/"
+                    logger.info(f"Start Downloading : {file_name}")
+                    output = await file.download(new_folder_dir, progress=prog.progress)
+                    body += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(output)).st_size)}]**"
+                    await asyncio.sleep(0.5)
 
-                logger.info(f"Start Downloading : {file_name}")
-                output = await file.download(new_folder_dir, progress=prog.progress)
-                body += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(output)).st_size)}]**"
-                await asyncio.sleep(0.5)
-
-                if len(body) > 4000:
-                    temp_text.append(body)
-                    body = ""
-                
-                if file_delete:
-                    await file.delete()
+                    if len(body) > 4000:
+                        temp_text.append(body)
+                        body = ""
+                    
+                    if file_delete:
+                        await file.delete()
+            except ValueError as e:
+                logger.error(f"{file}\n\nValueError: {e}")
+                continue
         
         if body != "":
             temp_text.append(body)
