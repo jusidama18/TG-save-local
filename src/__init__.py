@@ -23,11 +23,9 @@ logging.basicConfig(
 
 logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
-api_id, api_hash = int(getenv("API_ID", default=6)), getenv(
-    "API_HASH", default="eb06d4abfb49dc3eeb1aeb98ae0f581e"
-)
+api_id, api_hash = int(getenv("API_ID") or 6), getenv("API_HASH") or "eb06d4abfb49dc3eeb1aeb98ae0f581e"
 
-session_string = getenv("SESSION_STRING", default=None)
+session_string = getenv("SESSION_STRING") or None
 
 userbot = Client(
     "user",
@@ -42,7 +40,7 @@ app = Client(
     "bot",
     api_id=api_id,
     api_hash=api_hash,
-    bot_token=getenv("BOT_TOKEN", default=None),
+    bot_token=getenv("BOT_TOKEN") or None,
     max_concurrent_transmissions=1000,
     sleep_threshold=10,
     plugins=dict(root="src/plugins"),
