@@ -1,7 +1,5 @@
 # TG-save-local
 
-# Telegram File Downloader Bot
-
 This is a simple Telegram bot written in Python using the Pyrogram library. The bot allows you to download files from Telegram and save them to your local machine. It can be useful for quickly saving files sent to you in Telegram chats.
 
 ## Environment Setup
