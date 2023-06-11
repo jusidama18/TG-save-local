@@ -23,7 +23,7 @@ logging.basicConfig(
 
 logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
-api_id, api_hash = getenv("API_ID", default=6), getenv(
+api_id, api_hash = int(getenv("API_ID", default=6)), getenv(
     "API_HASH", default="eb06d4abfb49dc3eeb1aeb98ae0f581e"
 )
 
@@ -52,4 +52,4 @@ if session_string is not None:
 else:
     app.userbot = None
 
-OWNER_ID = [int(i) for i in str(getenv("OWNER_ID", "")).split()]
+OWNER_ID = list(map(int, str(getenv("OWNER_ID", "")).split()))

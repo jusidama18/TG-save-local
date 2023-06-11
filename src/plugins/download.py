@@ -144,8 +144,10 @@ async def cancel_download(_, query):
         )
 
 
-@Client.on_message(filters.command("ls") & filters.user(OWNER_ID))
+@Client.on_message(filters.command(["ls", "log"]) & filters.user(OWNER_ID))
 async def ls(_, message):
+    if message.command[0].startswith("log"):
+        return await message.reply_document("bot-log.txt", caption="`Bot Log`")
     args = message.text.split(None, 1)
     basepath = (
         f"{os.getcwd()}/{args[1]}{'' if args[1].endswith('/') else '/'}"
