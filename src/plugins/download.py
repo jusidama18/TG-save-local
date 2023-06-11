@@ -88,7 +88,7 @@ async def download(client, message):
     for index, file in enumerate(messages, start=1):
         if not isinstance(file, Message):
             o_file = file
-            file = await filter_tg_link(client, message)
+            file = await filter_tg_link(client, file)
             if len(messages) > 1 and isinstance(file, str):
                 await msg.reply(f"{o_file} > `{file}`", quote=True)
                 continue
