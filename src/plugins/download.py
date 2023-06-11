@@ -21,11 +21,11 @@ from src.utils.readable import HumanFormat
 logger = logging.getLogger(__name__)
 
 
-async def filter_tg_link(client, message):
+async def filter_tg_link(client, text):
     bot_id = client.me.username
     try:
         messages, session = await get_tg_link_content(
-            message.text, client, client.userbot
+            text, client, client.userbot
         )
     except ValueError as e:
         return e
