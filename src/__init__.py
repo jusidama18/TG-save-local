@@ -21,6 +21,8 @@ logging.basicConfig(
     datefmt="%d/%b/%Y | %I:%M:%S %p",
 )
 
+logging.getLogger("pyrogram").setLevel(logging.WARNING)
+
 api_id, api_hash = getenv("API_ID", default=6), getenv(
     "API_HASH", default="eb06d4abfb49dc3eeb1aeb98ae0f581e"
 )
