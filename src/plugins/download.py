@@ -38,7 +38,7 @@ async def filter_tg_link(client, text):
         )
         should_del = True
 
-    return messages, should_del if messages.media else "Link Provided not telegram media.", should_del
+    return messages, should_del if messages.media else "Link Provided not telegram media.", False
 
 
 @Client.on_message(filters.private & filters.user(OWNER_ID), group=1)
