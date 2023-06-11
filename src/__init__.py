@@ -23,7 +23,10 @@ logging.basicConfig(
 
 logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
-api_id, api_hash = int(getenv("API_ID") or 6), getenv("API_HASH") or "eb06d4abfb49dc3eeb1aeb98ae0f581e"
+api_id, api_hash = (
+    int(getenv("API_ID") or 6),
+    getenv("API_HASH") or "eb06d4abfb49dc3eeb1aeb98ae0f581e",
+)
 
 session_string = getenv("SESSION_STRING") or None
 
