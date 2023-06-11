@@ -78,6 +78,7 @@ async def download(client, message):
     else:
         return await message.reply("`Send File or Telegram message of file link`")
 
+
     if messages:
         msg = await message.reply(f"`Start Download {len(messages)} Files`")
         if len(messages) > 1 and not folder_name:
@@ -85,7 +86,6 @@ async def download(client, message):
 
         if folder_name:
             download_dir = download_dir.joinpath(folder_name)
-
         
         body, temp_text = "", []
         for index, file in enumerate(messages, start=1):
