@@ -32,7 +32,7 @@ async def filter_tg_link(client, text):
 
     if messages.chat.type.name not in ["SUPERGROUP", "CHANNEL"] and session != "user":
         return ("Use SuperGroup to download with User!", should_del)
-    
+
     if session == "user":
         messages = await client.userbot.copy_message(
             chat_id=bot_id, from_chat_id=messages.chat.id, message_id=messages.id
@@ -79,7 +79,6 @@ async def download(client, message):
     else:
         return await message.reply("`Send File or Telegram message of file link`")
 
-
     if messages:
         msg = await message.reply(f"`Start Download {len(messages)} Files`")
         if len(messages) > 1 and not folder_name:
@@ -87,7 +86,7 @@ async def download(client, message):
 
         if folder_name:
             download_dir = download_dir.joinpath(folder_name)
-        
+
         body, temp_text = "", []
         for index, file in enumerate(messages, start=1):
             file_delete = False
@@ -113,10 +112,12 @@ async def download(client, message):
                 )
                 new_folder_dir = download_dir
                 if not folder_name:
-                    new_folder_dir = new_folder_dir.joinpath(str(file.media.value))
+                    new_folder_dir = new_folder_dir.joinpath(
+                        str(file.media.value))
 
                 if file_name:
-                    new_folder_dir = new_folder_dir.joinpath(file_name).absolute()
+                    new_folder_dir = new_folder_dir.joinpath(
+                        file_name).absolute()
                 else:
                     new_folder_dir = f"{new_folder_dir.absolute()}/"
 
@@ -128,10 +129,10 @@ async def download(client, message):
                 if len(body) > 4000:
                     temp_text.append(body)
                     body = ""
-                
+
                 if file_delete:
                     await file.delete()
-        
+
         if body != "":
             temp_text.append(body)
 
