@@ -25,7 +25,7 @@ async def filter_tg_link(client, text):
     should_del = False
     bot_id = client.me.username
     try:
-        logger.info(f"Extract Media From URL : {}")
+        logger.info(f"Extract Media From URL : {text}")
         messages, session = await get_tg_link_content(text, client, client.userbot)
     except ValueError as e:
         return (e, should_del)
