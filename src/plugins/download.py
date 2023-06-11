@@ -30,13 +30,17 @@ async def filter_tg_link(client, text):
 
     if messages.chat.type.name not in ["SUPERGROUP", "CHANNEL"] and session != "user":
         return "Use SuperGroup to download with User!", False
-    
+
     if session == "user":
         messages = await client.userbot.copy_message(
             chat_id=bot_id, from_chat_id=messages.chat.id, message_id=messages.id
         )
 
-    return messages, True if messages.media else "Link Provided not telegram media.", False
+    return (
+        messages,
+        True if messages.media else "Link Provided not telegram media.",
+        False,
+    )
 
 
 @Client.on_message(filters.private & filters.user(OWNER_ID), group=1)
@@ -86,7 +90,6 @@ async def download(client, message):
     if folder_name:
         download_dir = download_dir.joinpath(folder_name)
 
-    
     body, temp_text = "", []
     for index, file in enumerate(messages, start=1):
         file_delete = False
@@ -127,10 +130,10 @@ async def download(client, message):
             if len(body) > 4000:
                 temp_text.append(body)
                 body = ""
-            
+
             if file_delete:
                 await file.delete()
-    
+
     if body != "":
         temp_text.append(body)
 
