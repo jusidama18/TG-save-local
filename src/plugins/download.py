@@ -78,71 +78,69 @@ async def download(client, message):
     else:
         return await message.reply("`Send File or Telegram message of file link`")
 
-    if not messages:
-        return
+    if messages:
+        msg = await message.reply(f"`Start Download {len(messages)} Files`")
+        if len(messages) > 1 and not folder_name:
+            folder_name = f"TG-BatchDL [{date}]"
 
-    msg = await message.reply(f"`Start Download {len(messages)} Files`")
-    if len(messages) > 1 and not folder_name:
-        folder_name = f"TG-BatchDL [{date}]"
+        if folder_name:
+            download_dir = download_dir.joinpath(folder_name)
 
-    if folder_name:
-        download_dir = download_dir.joinpath(folder_name)
+        
+        body, temp_text = "", []
+        for index, file in enumerate(messages, start=1):
+            file_delete = False
+            if not isinstance(file, Message):
+                o_file = file
+                file, file_delete = await filter_tg_link(client, file)
+                if len(messages) > 1 and isinstance(file, str):
+                    await msg.reply(f"{o_file} > `{file}`", quote=True)
+                    continue
 
-    
-    body, temp_text = "", []
-    for index, file in enumerate(messages, start=1):
-        file_delete = False
-        if not isinstance(file, Message):
-            o_file = file
-            file, file_delete = await filter_tg_link(client, file)
-            if len(messages) > 1 and isinstance(file, str):
-                await msg.reply(f"{o_file} > `{file}`", quote=True)
-                continue
+            if file.media and not file.empty:
+                file_data = getattr(file, file.media.value, None)
+                file_name = getattr(file_data, "file_name", None)
+                prog = Progress(
+                    message=msg,
+                    user=message.from_user.id,
+                    client=client,
+                    chatID=message.chat.id,
+                    mID=message.id,
+                    prog_text="`Downloading This File!`",
+                    file_name=file_name,
+                    extra_text=({"Files": f"{index} / {len(messages)}"}),
+                )
+                new_folder_dir = download_dir
+                if not folder_name:
+                    new_folder_dir = new_folder_dir.joinpath(str(file.media.value))
 
-        if file.media and not file.empty:
-            file_data = getattr(file, file.media.value, None)
-            file_name = getattr(file_data, "file_name", None)
-            prog = Progress(
-                message=msg,
-                user=message.from_user.id,
-                client=client,
-                chatID=message.chat.id,
-                mID=message.id,
-                prog_text="`Downloading This File!`",
-                file_name=file_name,
-                extra_text=({"Files": f"{index} / {len(messages)}"}),
-            )
-            new_folder_dir = download_dir
-            if not folder_name:
-                new_folder_dir = new_folder_dir.joinpath(str(file.media.value))
+                if file_name:
+                    new_folder_dir = new_folder_dir.joinpath(file_name).absolute()
+                else:
+                    new_folder_dir = f"{new_folder_dir.absolute()}/"
 
-            if file_name:
-                new_folder_dir = new_folder_dir.joinpath(file_name).absolute()
-            else:
-                new_folder_dir = f"{new_folder_dir.absolute()}/"
+                logger.info(f"Start Downloading : {file_name}")
+                output = await file.download(new_folder_dir, progress=prog.progress)
+                body += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(output)).st_size)}]**"
+                await asyncio.sleep(0.5)
 
-            logger.info(f"Start Downloading : {file_name}")
-            output = await file.download(new_folder_dir, progress=prog.progress)
-            body += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(output)).st_size)}]**"
-            await asyncio.sleep(0.5)
+                if len(body) > 4000:
+                    temp_text.append(body)
+                    body = ""
+                
+                if file_delete:
+                    await file.delete()
+        
+        if body != "":
+            temp_text.append(body)
 
-            if len(body) > 4000:
-                temp_text.append(body)
-                body = ""
-            
-            if file_delete:
-                await file.delete()
-    
-    if body != "":
-        temp_text.append(body)
-
-    dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
-    footer = f"\n\n**Time Taken : {dlTime}**"
-    if temp_text:
-        header = "**Finish Download :**\n"
-        for body in temp_text:
-            await message.reply(header + body + footer)
-        await msg.delete()
+        dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
+        footer = f"\n\n**Time Taken : {dlTime}**"
+        if temp_text:
+            header = "**Finish Download :**\n"
+            for body in temp_text:
+                await message.reply(header + body + footer)
+            await msg.delete()
 
 
 @Client.on_callback_query(
