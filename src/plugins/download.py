@@ -26,16 +26,17 @@ async def filter_tg_link(client, text):
     try:
         messages, session = await get_tg_link_content(text, client, client.userbot)
     except ValueError as e:
-        return e
+        return e, False
 
     if messages.chat.type.name not in ["SUPERGROUP", "CHANNEL"] and session != "user":
-        return "Use SuperGroup to download with User!"
+        return "Use SuperGroup to download with User!", False
+    
     if session == "user":
         messages = await client.userbot.copy_message(
             chat_id=bot_id, from_chat_id=messages.chat.id, message_id=messages.id
         )
 
-    return messages if messages.media else "Link Provided not telegram media."
+    return messages, True if messages.media else "Link Provided not telegram media.", False
 
 
 @Client.on_message(filters.private & filters.user(OWNER_ID), group=1)
@@ -85,11 +86,13 @@ async def download(client, message):
     if folder_name:
         download_dir = download_dir.joinpath(folder_name)
 
-    body = ""
+    
+    body, temp_text = "", []
     for index, file in enumerate(messages, start=1):
+        file_delete = False
         if not isinstance(file, Message):
             o_file = file
-            file = await filter_tg_link(client, file)
+            file, file_delete = await filter_tg_link(client, file)
             if len(messages) > 1 and isinstance(file, str):
                 await msg.reply(f"{o_file} > `{file}`", quote=True)
                 continue
@@ -120,11 +123,24 @@ async def download(client, message):
             output = await file.download(new_folder_dir, progress=prog.progress)
             body += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(output)).st_size)}]**"
             await asyncio.sleep(0.5)
+
+            if len(body) > 4000:
+                temp_text.append(body)
+                body = ""
+            
+            if file_delete:
+                await file.delete()
+    
+    if body != "":
+        temp_text.append(body)
+
     dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
     footer = f"\n\n**Time Taken : {dlTime}**"
-    if body != "":
+    if temp_text:
         header = "**Finish Download :**\n"
-        await msg.edit(header + body + footer)
+        for body in temp_text:
+            await message.reply(header + body + footer)
+        await msg.delete()
 
 
 @Client.on_callback_query(
