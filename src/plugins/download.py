@@ -24,9 +24,7 @@ logger = logging.getLogger(__name__)
 async def filter_tg_link(client, text):
     bot_id = client.me.username
     try:
-        messages, session = await get_tg_link_content(
-            text, client, client.userbot
-        )
+        messages, session = await get_tg_link_content(text, client, client.userbot)
     except ValueError as e:
         return e
 
@@ -36,7 +34,7 @@ async def filter_tg_link(client, text):
         messages = await client.userbot.copy_message(
             chat_id=bot_id, from_chat_id=messages.chat.id, message_id=messages.id
         )
-        
+
     return messages if messages.media else "Link Provided not telegram media."
 
 
