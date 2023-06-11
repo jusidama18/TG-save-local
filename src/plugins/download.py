@@ -97,7 +97,7 @@ async def download(client, message):
                     await msg.reply(f"{o_file} > `{file}`", quote=True)
                     continue
 
-            if file.media and not file.empty:
+            if not file.empty and file.media:
                 file_data = getattr(file, file.media.value, None)
                 file_name = getattr(file_data, "file_name", None)
                 prog = Progress(
