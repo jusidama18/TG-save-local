@@ -122,7 +122,8 @@ async def download(client, message):
             await asyncio.sleep(0.5)
     dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
     footer = f"\n\n**Time Taken : {dlTime}**"
-    await msg.edit(header + bo)
+    if body != "":
+        await msg.edit(header + body + footer)
 
 
 @Client.on_callback_query(
