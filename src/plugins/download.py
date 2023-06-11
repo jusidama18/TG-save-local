@@ -78,13 +78,14 @@ async def download(client, message):
         return await message.reply("`Send File or Telegram message of file link`")
 
     msg = await message.reply(f"`Start Download {len(messages)} Files`")
-    text = "**Finish Download :**\n"
+    header = "**Finish Download :**\n"
     if len(messages) > 1 and not folder_name:
         folder_name = f"TG-BatchDL-{message.id} [{date}]"
 
     if folder_name:
         download_dir = download_dir.joinpath(folder_name)
 
+    body = ""
     for index, file in enumerate(messages, start=1):
         if not isinstance(file, Message):
             o_file = file
@@ -117,11 +118,11 @@ async def download(client, message):
 
             logger.info(f"Start Downloading : {file_name}")
             output = await file.download(new_folder_dir, progress=prog.progress)
-            text += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(output)).st_size)}]**"
+            body += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(output)).st_size)}]**"
             await asyncio.sleep(0.5)
     dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
-    text += f"\n\n**Time Taken : {dlTime}**"
-    await msg.edit(text)
+    footer = f"\n\n**Time Taken : {dlTime}**"
+    await msg.edit(header + bo)
 
 
 @Client.on_callback_query(
