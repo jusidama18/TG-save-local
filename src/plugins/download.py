@@ -120,6 +120,9 @@ async def download(client, message):
                 new_folder_dir = download_dir
                 if not folder_name:
                     new_folder_dir = new_folder_dir.joinpath(temp_folder or str(file.media.value))
+                else:
+                    if temp_folder:
+                        new_folder_dir = new_folder_dir.joinpath(temp_folder)
         
                 if file_name:
                     new_folder_dir = new_folder_dir.joinpath(file_name).absolute()
