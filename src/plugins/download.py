@@ -131,7 +131,8 @@ async def download(client, message):
 
                 logger.info(f"Start Downloading : {file_name}")
                 output = await file.download(new_folder_dir, progress=prog.progress)
-                body += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(output)).st_size)}]**"
+                if output is not None:
+                    body += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(output)).st_size)}]**"
                 await asyncio.sleep(0.5)
 
                 if len(body) > 4000:
