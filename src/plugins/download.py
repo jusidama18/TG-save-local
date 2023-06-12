@@ -102,6 +102,7 @@ async def download(client, message):
                     more_file = await file.get_media_group()
                     file = more_file[0]
                     messages.extend(more_file[1:])
+                    folder_name = f"TG-MediaGroup [{date}]"
 
             if not file.empty and file.media:
                 file_data = getattr(file, file.media.value, None)
