@@ -120,16 +120,7 @@ async def download(client, message):
             if not file.empty and file.media:
                 file_data = getattr(file, file.media.value, None)
                 file_name = getattr(file_data, "file_name", None)
-                prog = Progress(
-                    message=msg,
-                    user=message.from_user.id,
-                    client=client,
-                    chatID=message.chat.id,
-                    mID=message.id,
-                    prog_text="`Downloading This File!`",
-                    file_name=file_name,
-                    extra_text=({"Files": f"{index} / {len(messages)}"}),
-                )
+
                 new_folder_dir = download_dir
                 if not folder_name:
                     new_folder_dir = new_folder_dir.joinpath(temp_folder or str(file.media.value))
@@ -140,6 +131,17 @@ async def download(client, message):
                     new_folder_dir = new_folder_dir.joinpath(file_name).absolute()
                 else:
                     new_folder_dir = f"{new_folder_dir.absolute()}/"
+
+                prog = Progress(
+                    message=msg,
+                    user=message.from_user.id,
+                    client=client,
+                    chatID=message.chat.id,
+                    mID=message.id,
+                    prog_text="`Downloading This File!`",
+                    file_name=new_folder_dir,
+                    extra_text=({"Files": f"{index} / {len(messages)}"}),
+                )
 
                 logger.info(f"Start Downloading : {new_folder_dir}")
                 output = await file.download(new_folder_dir, progress=prog.progress)
