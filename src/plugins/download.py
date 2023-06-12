@@ -32,14 +32,18 @@ async def filter_tg_link(client, text):
 
     if messages.chat.type.name not in ["SUPERGROUP", "CHANNEL"] and session != "user":
         return ("Use SuperGroup to download with User!", should_del)
-    
+
     if session == "user":
         messages = await client.userbot.copy_message(
             chat_id=bot_id, from_chat_id=messages.chat.id, message_id=messages.id
         )
         should_del = True
 
-    return (messages, should_del) if messages.media else ("Link Provided not telegram media.", False)
+    return (
+        (messages, should_del)
+        if messages.media
+        else ("Link Provided not telegram media.", False)
+    )
 
 
 @Client.on_message(filters.private & filters.user(OWNER_ID), group=1)
@@ -79,7 +83,6 @@ async def download(client, message):
     else:
         return await message.reply("`Send File or Telegram message of file link`")
 
-
     if messages:
         msg = await message.reply(f"`Start Download {len(messages)} Files`")
         if len(messages) > 1 and not folder_name:
@@ -91,7 +94,7 @@ async def download(client, message):
         body, temp_text, num = "", [], 1
         for index, file in enumerate(messages, start=1):
             file_delete, temp_folder = False, None
-            
+
             if isinstance(file, dict):
                 temp_folder = file["folder"]
                 file = file["file"]
@@ -106,16 +109,10 @@ async def download(client, message):
                     more_file = await file.get_media_group()
                     file = more_file[0]
                     temp_folder = f"TG-MediaGroup #{num} [{file.media.value}]"
-                    __data = [
-                        {
-                            "folder": temp_folder, 
-                            "file": i
-                        }
-                        for i in more_file[1:]
-                    ]
+                    __data = [{"folder": temp_folder, "file": i}
+                              for i in more_file[1:]]
                     messages.extend(__data)
                     num += 1
-                    
 
             if not file.empty and file.media:
                 file_data = getattr(file, file.media.value, None)
@@ -123,12 +120,15 @@ async def download(client, message):
 
                 new_folder_dir = download_dir
                 if not folder_name:
-                    new_folder_dir = new_folder_dir.joinpath(temp_folder or str(file.media.value))
+                    new_folder_dir = new_folder_dir.joinpath(
+                        temp_folder or str(file.media.value)
+                    )
                 elif temp_folder:
                     new_folder_dir = new_folder_dir.joinpath(temp_folder)
 
                 if file_name:
-                    new_folder_dir = new_folder_dir.joinpath(file_name).absolute()
+                    new_folder_dir = new_folder_dir.joinpath(
+                        file_name).absolute()
                 else:
                     new_folder_dir = f"{new_folder_dir.absolute()}/"
 
