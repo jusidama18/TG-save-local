@@ -87,22 +87,34 @@ async def download(client, message):
 
         if folder_name:
             download_dir = download_dir.joinpath(folder_name)
-        
-        body, temp_text = "", []
+
+        body, temp_text, num = "", [], 1
         for index, file in enumerate(messages, start=1):
             file_delete, temp_folder = False, None
-            if not isinstance(file, Message):
+            
+            if isinstance(file, dict):
+                temp_folder = file["folder"]
+                file = file["file"]
+            elif not isinstance(file, Message):
                 o_file = file
                 file, file_delete = await filter_tg_link(client, file)
                 if len(messages) > 1 and isinstance(file, str):
                     await msg.reply(f"{o_file} > `{file}`", quote=True)
                     continue
-                
+
                 if file.media_group_id:
                     more_file = await file.get_media_group()
                     file = more_file[0]
-                    messages.extend(more_file[1:])
-                    temp_folder = f"TG-MediaGroup [{file.media.value}] [{date}]"
+                    __data = [
+                        {
+                            "folder": f"TG-MediaGroup #{num} [{file.media.value}]", 
+                            "file": i
+                        }
+                        for i in more_file[1:]
+                    ]
+                    messages.extend(__data)
+                    num += 1
+                    
 
             if not file.empty and file.media:
                 file_data = getattr(file, file.media.value, None)
@@ -120,10 +132,9 @@ async def download(client, message):
                 new_folder_dir = download_dir
                 if not folder_name:
                     new_folder_dir = new_folder_dir.joinpath(temp_folder or str(file.media.value))
-                else:
-                    if temp_folder:
-                        new_folder_dir = new_folder_dir.joinpath(temp_folder)
-        
+                elif temp_folder:
+                    new_folder_dir = new_folder_dir.joinpath(temp_folder)
+
                 if file_name:
                     new_folder_dir = new_folder_dir.joinpath(file_name).absolute()
                 else:
@@ -138,10 +149,10 @@ async def download(client, message):
                 if len(body) > 4000:
                     temp_text.append(body)
                     body = ""
-                
+
                 if file_delete:
                     await file.delete()
-        
+
         if body != "":
             temp_text.append(body)
 
