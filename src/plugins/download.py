@@ -97,6 +97,11 @@ async def download(client, message):
                 if len(messages) > 1 and isinstance(file, str):
                     await msg.reply(f"{o_file} > `{file}`", quote=True)
                     continue
+                
+                if file.media_group_id:
+                    more_file = await file.get_media_group()
+                    file = more_file[0]
+                    messages.extend(more_file[1:])
 
             if not file.empty and file.media:
                 file_data = getattr(file, file.media.value, None)
