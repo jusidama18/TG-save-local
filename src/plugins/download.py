@@ -105,9 +105,10 @@ async def download(client, message):
                 if file.media_group_id:
                     more_file = await file.get_media_group()
                     file = more_file[0]
+                    temp_folder = f"TG-MediaGroup #{num} [{file.media.value}]"
                     __data = [
                         {
-                            "folder": f"TG-MediaGroup #{num} [{file.media.value}]", 
+                            "folder": , 
                             "file": i
                         }
                         for i in more_file[1:]
@@ -140,7 +141,7 @@ async def download(client, message):
                 else:
                     new_folder_dir = f"{new_folder_dir.absolute()}/"
 
-                logger.info(f"Start Downloading : {file_name}")
+                logger.info(f"Start Downloading : {new_folder_dir}")
                 output = await file.download(new_folder_dir, progress=prog.progress)
                 if output is not None:
                     body += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(output)).st_size)}]**"
