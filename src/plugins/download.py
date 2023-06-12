@@ -49,9 +49,9 @@ async def download(client, message):
     date = datetime.now().strftime("%Y-%m-%d %H:%M")
     start = datetime.now().timestamp()
     if message.media_group_id:
-        folder_name = f"TG-MediaGroup [{date}]"
         download_dir = download_dir.joinpath()
         messages = await message.get_media_group()
+        folder_name = f"TG-MediaGroup [{messages[0].media.value}] [{date}]"
     elif message.media and not message.empty:
         if (file_ := message.document) and (file_.mime_type == "text/plain"):
             links_list = []
@@ -90,7 +90,7 @@ async def download(client, message):
         
         body, temp_text = "", []
         for index, file in enumerate(messages, start=1):
-            file_delete = False
+            file_delete, temp_folder = False, None
             if not isinstance(file, Message):
                 o_file = file
                 file, file_delete = await filter_tg_link(client, file)
@@ -102,7 +102,7 @@ async def download(client, message):
                     more_file = await file.get_media_group()
                     file = more_file[0]
                     messages.extend(more_file[1:])
-                    folder_name = f"TG-MediaGroup [{date}]"
+                    temp_folder = f"TG-MediaGroup [{file.media.value}] [{date}]"
 
             if not file.empty and file.media:
                 file_data = getattr(file, file.media.value, None)
@@ -119,8 +119,8 @@ async def download(client, message):
                 )
                 new_folder_dir = download_dir
                 if not folder_name:
-                    new_folder_dir = new_folder_dir.joinpath(str(file.media.value))
-
+                    new_folder_dir = new_folder_dir.joinpath(temp_folder or str(file.media.value))
+        
                 if file_name:
                     new_folder_dir = new_folder_dir.joinpath(file_name).absolute()
                 else:
