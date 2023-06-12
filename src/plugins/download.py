@@ -108,7 +108,7 @@ async def download(client, message):
                     temp_folder = f"TG-MediaGroup #{num} [{file.media.value}]"
                     __data = [
                         {
-                            "folder": , 
+                            "folder": temp_folder, 
                             "file": i
                         }
                         for i in more_file[1:]
