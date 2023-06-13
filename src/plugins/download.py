@@ -155,7 +155,7 @@ async def download(client, message):
             )
             header = f"**Finish Download [{len(success)}/{len(messages)}] [{folder_size}] :**\n"
             body = ""
-            for output in success:
+            for index, output in enumerate(success):
                 body += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(output)).st_size)}]**"
                 if len(body) > 4000:
                     message = await message.reply(header + body + footer, quote=True)
