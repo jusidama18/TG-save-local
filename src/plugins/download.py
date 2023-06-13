@@ -160,7 +160,7 @@ async def download(client, message):
         if temp_text:
             header = "**Finish Download :**\n"
             for body in temp_text:
-                await message.reply(header + body + footer)
+                await message.reply(header + body + footer, quote=True)
             await msg.delete()
 
 
