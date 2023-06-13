@@ -151,7 +151,7 @@ async def download(client, message):
         dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
         footer = f"\n\n**Time Taken : {dlTime}**"
         if success:
-            header = "**Finish Download :**\n"
+            header = f"**Finish Download [{len(success)}/{len(messages)}] :**\n"
             body = ""
             for output in success:
                 body += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(output)).st_size)}]**"
