@@ -160,6 +160,8 @@ async def download(client, message):
                 if len(body) > 4000:
                     message = await message.reply(header + body + footer, quote=True)
                     body = ""
+                if body != "":
+                    message = await message.reply(header + body + footer, quote=True)
             await msg.delete()
 
 
