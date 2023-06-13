@@ -58,7 +58,9 @@ async def download(client, message):
     elif message.media and not message.empty:
         if (file_ := message.document) and (file_.mime_type == "text/plain"):
             async with aiofiles.open(await message.download(), "r+") as f:
-                links_list = [line.strip() for line in await f.readlines() if len(line) != 0]
+                links_list = [
+                    line.strip() for line in await f.readlines() if len(line) != 0
+                ]
             messages = [
                 line
                 for line in links_list
