@@ -147,9 +147,9 @@ async def download(client, message):
                 if file_delete:
                     await file.delete()
 
-        dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
-        footer = f"\n\n**Time Taken : {dlTime}**"
         if success:
+            dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
+            footer = f"\n\n**Time Taken : {dlTime}**"
             folder_size = HumanFormat.ToBytes(
                 sum(HumanFormat.PathSize(f) for f in success)
             )
