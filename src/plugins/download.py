@@ -53,7 +53,6 @@ async def download(client, message):
     date = datetime.now().strftime("%Y-%m-%d %H:%M")
     start = datetime.now().timestamp()
     if message.media_group_id:
-        download_dir = download_dir.joinpath()
         messages = await message.get_media_group()
         folder_name = f"TG-MediaGroup [{messages[0].media.value}] [{date}]"
     elif message.media and not message.empty:
@@ -151,7 +150,10 @@ async def download(client, message):
         dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
         footer = f"\n\n**Time Taken : {dlTime}**"
         if success:
-            header = f"**Finish Download [{len(success)}/{len(messages)}] :**\n"
+            folder_size = HumanFormat.ToBytes(
+                sum(HumanFormat.PathSize(f) for f in success)
+            )
+            header = f"**Finish Download [{len(success)}/{len(messages)}] [{folder_size}] :**\n"
             body = ""
             for output in success:
                 body += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(output)).st_size)}]**"
