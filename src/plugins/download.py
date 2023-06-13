@@ -87,7 +87,7 @@ async def download(client, message):
         if folder_name:
             download_dir = download_dir.joinpath(folder_name)
 
-        body, temp_text, num = "", [], 1
+        success, num = [], 1
         for index, file in enumerate(messages, start=1):
             file_delete, temp_folder = False, None
 
@@ -142,25 +142,22 @@ async def download(client, message):
                 logger.info(f"Start Downloading : {new_folder_dir}")
                 output = await file.download(new_folder_dir, progress=prog.progress)
                 if output is not None:
-                    body += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(output)).st_size)}]**"
+                    success.append(output)
                 await asyncio.sleep(0.5)
-
-                if len(body) > 4000:
-                    temp_text.append(body)
-                    body = ""
 
                 if file_delete:
                     await file.delete()
 
-        if body != "":
-            temp_text.append(body)
-
         dlTime = HumanFormat.Time(datetime.now().timestamp() - start)
         footer = f"\n\n**Time Taken : {dlTime}**"
-        if temp_text:
+        if success:
             header = "**Finish Download :**\n"
-            for body in temp_text:
-                await message.reply(header + body + footer, quote=True)
+            body = ""
+            for output in success:
+                body += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(output)).st_size)}]**"
+                if len(body) > 4000:
+                    message = await message.reply(header + body + footer, quote=True)
+                    body = ""
             await msg.delete()
 
 
