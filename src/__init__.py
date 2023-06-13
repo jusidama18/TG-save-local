@@ -12,7 +12,7 @@ if path.exists("config.env"):
     load_dotenv("config.env", override=True)
 
 logging.basicConfig(
-    format="%(asctime)s - %(name)s [%(levelname)s] : %(message)s",
+    format="%(asctime)s - %(name)s (%(lineno)d) [%(levelname)s] : %(message)s",
     handlers=[
         logging.FileHandler("bot-log.txt", mode="w"),
         logging.StreamHandler(),
