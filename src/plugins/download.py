@@ -58,12 +58,8 @@ async def download(client, message):
         folder_name = f"TG-MediaGroup [{messages[0].media.value}] [{date}]"
     elif message.media and not message.empty:
         if (file_ := message.document) and (file_.mime_type == "text/plain"):
-            links_list = []
-            text_file_dir = await message.download()
-            async with aiofiles.open(text_file_dir, "r+") as f:
-                lines = await f.readlines()
-                links_list.extend(line.strip()
-                                  for line in lines if len(line) != 0)
+            async with aiofiles.open(await message.download(), "r+") as f:
+                links_list = [line.strip() for line in await f.readlines() if len(line) != 0]
             messages = [
                 line
                 for line in links_list
