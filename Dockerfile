@@ -1,5 +1,8 @@
 FROM ubuntu:latest
 
+# Set Your Local Timezone
+ENV TZ="Asia/Jakarta"
+
 # Set working directory
 WORKDIR /app
 
