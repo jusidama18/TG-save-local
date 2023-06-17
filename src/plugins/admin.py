@@ -1,5 +1,5 @@
 from io import BytesIO
-from sys import executable, argv
+from sys import executable
 from os import path, listdir, getcwd, execvp
 
 from pyrogram import Client, filters
@@ -45,4 +45,4 @@ async def ls(_, message):
 @Client.on_message(filters.command("restart") & filters.user(OWNER_ID))
 async def restart(_, m):
     await m.reply("Restart will done in few seconds.")
-    execvp(executable, [executable, *argv])
+    execvp(executable, [executable, "-m", "src"])
