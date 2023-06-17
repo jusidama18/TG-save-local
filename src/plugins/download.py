@@ -16,6 +16,7 @@ from src.utils.readable import HumanFormat
 
 logger = logging.getLogger(__name__)
 
+logger.info("Bot Start")
 
 async def filter_tg_link(client, text):
     should_del = False
