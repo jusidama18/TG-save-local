@@ -1,17 +1,13 @@
-import os
 import logging
 import aiofiles
 import asyncio
 
-from io import BytesIO
 from pathlib import Path
-from aiofiles.os import path, stat, listdir
 
 from datetime import datetime
 
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from pyrogram.errors import MessageTooLong
 
 from src import OWNER_ID
 from src.utils.progress import Progress, ProgressTask
@@ -164,7 +160,7 @@ async def download(client, message):
             header = f"**Finish Download [{len(success)}/{len(messages)}] [{folder_size}] :**\n"
             body = ""
             for index, output in enumerate(success, start=1):
-                body += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes((await stat(output)).st_size)}]**"
+                body += f"\n**{index}.** `{output}` **[{HumanFormat.ToBytes(HumanFormat.PathSize(output))}]**"
                 if len(body) > 4000:
                     message = await message.reply(header + body + footer, quote=True)
                     body = ""
@@ -188,37 +184,3 @@ async def cancel_download(_, query):
         await query.answer(
             "This Is Not Your Download. So, dont touch on this.", show_alert=True
         )
-
-
-@Client.on_message(filters.command(["ls", "log"]) & filters.user(OWNER_ID))
-async def ls(_, message):
-    if message.command[0].startswith("log"):
-        return await message.reply_document("bot-log.txt", caption="`Bot Log`")
-    args = message.text.split(None, 1)
-    basepath = (
-        f"{os.getcwd()}/{args[1]}{'' if args[1].endswith('/') else '/'}"
-        if len(args) == 2
-        else f"{os.getcwd()}/"
-    )
-    directory, listfile = "", ""
-    try:
-        file_list = await listdir(basepath)
-        file_list.sort()
-        for entry in file_list:
-            fpath = os.path.join(basepath, entry)
-            if await path.isdir(fpath):
-                size = HumanFormat.ToBytes(HumanFormat.PathSize(fpath))
-                directory += f"\n📂 `{entry}` (`{size}`)"
-            if await path.isfile(fpath):
-                size = HumanFormat.ToBytes((await stat(fpath)).st_size)
-                listfile += f"\n📄 `{entry}` (`{size}`)"
-        text = f"**Path :** `{basepath}`\n\n**List Directory :**{directory}\n\n**List File :**{listfile}"
-        return await message.reply_text(text, quote=True)
-    except FileNotFoundError:
-        return await message.reply_text("`File/Folder Not Found.`", quote=True)
-    except MessageTooLong:
-        with BytesIO(text.encode()) as file:
-            file.name = "File-List.txt"
-            return await message.reply_document(
-                file, caption="File List Too Long.", quote=True
-            )
