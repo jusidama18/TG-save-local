@@ -38,12 +38,17 @@ userbot = Client(
     sleep_threshold=10,
     max_concurrent_transmissions=1000,
 )
+bot_token = getenv("BOT_TOKEN") or None
+
+if not bot_token:
+    logging.error("Add 'BOT_TOKEN', exit now.")
+    exit(1)
 
 app = Client(
     "bot",
     api_id=api_id,
     api_hash=api_hash,
-    bot_token=getenv("BOT_TOKEN") or None,
+    bot_token=bot_token,
     max_concurrent_transmissions=1000,
     sleep_threshold=10,
     plugins=dict(root="src/plugins"),
