@@ -20,8 +20,7 @@ async def ls(_, message):
     )
     directory, listfile = "", ""
     try:
-        file_list = await listdir(basepath)
-        file_list.sort()
+        file_list = sorted(listdir(basepath))
         for entry in file_list:
             fpath = path.join(basepath, entry)
             if await path.isdir(fpath):
