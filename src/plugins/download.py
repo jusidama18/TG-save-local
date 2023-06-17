@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 logger.info("Bot Start")
 
+
 async def filter_tg_link(client, text):
     should_del = False
     bot_id = client.me.username
@@ -42,10 +43,13 @@ async def filter_tg_link(client, text):
         else ("Link Provided not telegram media.", False)
     )
 
+
 @Client.on_message(filters.command("save") & ~filters.private & filters.user(OWNER_ID))
 async def save(client, message):
     if not message.reply_to_message:
-        return await message.reply("Reply To Supported Message Media or Text with TG Links")
+        return await message.reply(
+            "Reply To Supported Message Media or Text with TG Links"
+        )
     return await download(client, message.reply_to_message)
 
 
