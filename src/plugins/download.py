@@ -129,6 +129,8 @@ async def download(client, message):
                 if file_name:
                     new_folder_dir = new_folder_dir.joinpath(
                         file_name).absolute()
+                    if new_folder_dir.exists():
+                        new_folder_dir.unlink()
                 else:
                     new_folder_dir = f"{new_folder_dir.absolute()}/"
 
