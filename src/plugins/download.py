@@ -20,16 +20,19 @@ logger.info("Bot Start")
 
 
 async def filter_tg_link(client, text):
-    should_del = False
+    should_del, is_single = False, False
     bot_id = client.me.username
     try:
         logger.info(f"Extract Media From URL : {text}")
         messages, session = await get_tg_link_content(text, client, client.userbot)
+        check_single = text.split("?")
+        if len(check_single) > 1 and check_single[1] == "single":
+            is_single = True
     except ValueError as e:
-        return (f"ValueError: {e}", should_del)
+        return (f"ValueError: {e}", should_del, is_single)
 
     if messages.chat.type.name not in ["SUPERGROUP", "CHANNEL"] and session != "user":
-        return ("Use SuperGroup to download with User!", should_del)
+        return ("Use SuperGroup to download with User!", should_del, is_single)
 
     if session == "user":
         messages = await client.userbot.copy_message(
@@ -38,9 +41,9 @@ async def filter_tg_link(client, text):
         should_del = True
 
     return (
-        (messages, should_del)
+        (messages, should_del, is_single)
         if messages.media
-        else ("Link Provided not telegram media.", False)
+        else ("Link Provided not telegram media.", False, is_single)
     )
 
 
@@ -104,12 +107,12 @@ async def download(client, message):
                 file = file["file"]
             elif not isinstance(file, Message):
                 o_file = file
-                file, file_delete = await filter_tg_link(client, file)
+                file, file_delete, is_single = await filter_tg_link(client, file)
                 if len(messages) > 1 and isinstance(file, str):
                     await msg.reply(f"{o_file} > `{file}`", quote=True)
                     continue
 
-                if file.media_group_id:
+                if file.media_group_id and not is_single:
                     more_file = await file.get_media_group()
                     file = more_file[0]
                     temp_folder = f"TG-MediaGroup #{num} [{file.media.value}]"
