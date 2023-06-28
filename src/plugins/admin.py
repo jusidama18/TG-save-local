@@ -8,6 +8,7 @@ from pyrogram.errors import MessageTooLong
 from src import allowed_users
 from src.utils.readable import HumanFormat
 
+
 @Client.on_message(filters.command(["ls", "log"]) & filters.user(allowed_users))
 async def ls(_, message):
     if message.command[0].startswith("log"):
