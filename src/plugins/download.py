@@ -129,13 +129,15 @@ async def download(client, message):
                 file_name = getattr(file_data, "file_name", None)
 
                 new_folder_dir = download_dir
-                if not folder_name:
-                    new_folder_dir = new_folder_dir.joinpath(
-                        temp_folder or str(file.media.value)
-                    )
-                elif temp_folder:
+                if (
+                    not folder_name
+                    and temp_folder
+                    or folder_name
+                    and temp_folder
+                ):
                     new_folder_dir = new_folder_dir.joinpath(temp_folder)
-
+                elif not folder_name:
+                    new_folder_dir = new_folder_dir.joinpath(str(file.media.value).title()).joinpath(str(date).split()[0])
                 if file_name:
                     new_folder_dir = new_folder_dir.joinpath(
                         file_name).absolute()
