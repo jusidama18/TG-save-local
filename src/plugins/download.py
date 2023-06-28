@@ -47,10 +47,10 @@ async def filter_tg_link(client, text):
     )
 
 
-@Client.on_message(filters.command(["save", "remove"]) & ~filters.private & filters.user(OWNER_ID))
+@Client.on_message(filters.command(["save", "remove"]) & filters.user(OWNER_ID))
 async def save(client, message):
     target: str = message.command[0]
-    if target.startswith("save"):
+    if target.startswith("save") and message.chat.type.value != "private":
         if not message.reply_to_message:
             return await message.reply(
                 "Reply To Supported Message Media or Text with TG Links", quote=True
