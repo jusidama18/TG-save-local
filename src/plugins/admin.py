@@ -23,10 +23,10 @@ async def ls(_, message):
         file_list = sorted(listdir(basepath))
         for entry in file_list:
             fpath = path.join(basepath, entry)
-            if await path.isdir(fpath):
+            if path.isdir(fpath):
                 size = HumanFormat.ToBytes(HumanFormat.PathSize(fpath))
                 directory += f"\n📂 `{entry}` (`{size}`)"
-            if await path.isfile(fpath):
+            if path.isfile(fpath):
                 size = HumanFormat.ToBytes(HumanFormat.PathSize(fpath))
                 listfile += f"\n📄 `{entry}` (`{size}`)"
         text = f"**Path :** `{basepath}`\n\n**List Directory :**{directory}\n\n**List File :**{listfile}"
