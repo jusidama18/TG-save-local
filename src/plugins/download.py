@@ -47,14 +47,26 @@ async def filter_tg_link(client, text):
     )
 
 
-@Client.on_message(filters.command("save") & ~filters.private & filters.user(OWNER_ID))
+@Client.on_message(filters.command(["save", "remove"]) & ~filters.private & filters.user(OWNER_ID))
 async def save(client, message):
-    if not message.reply_to_message:
-        return await message.reply(
-            "Reply To Supported Message Media or Text with TG Links"
-        )
-    return await download(client, message.reply_to_message)
-
+    m: str = message.command[0]
+    if m.startswith("save"):
+        if not message.reply_to_message:
+            return await message.reply(
+                "Reply To Supported Message Media or Text with TG Links"
+            )
+        return await download(client, message.reply_to_message)
+    elif m.startswith("remove"):
+        if len(message.command) > 1:
+            if Path(message.command[1]).exists():
+                await aiofiles.os.remove(message.command[1])
+                status = "Success"
+            else:
+                status = "Failed"
+            text = f"**{status} to delete :** `{message.command[1]}`"
+        else:
+            text = "**Provide path to remove.**"
+        return await message.reply(text, quote=True)
 
 @Client.on_message(filters.private & filters.user(OWNER_ID), group=1)
 async def download(client, message):
