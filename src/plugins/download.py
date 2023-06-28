@@ -115,7 +115,11 @@ async def download(client, message):
                 if file.media_group_id and not is_single:
                     more_file = await file.get_media_group()
                     file = more_file[0]
-                    temp_folder = f"TG-MediaGroup #{num} [{file.media.value}]"
+                    while True:
+                        temp_folder = f"TG-MediaGroup #{num} [{file.media.value}]"
+                        if not download_dir.joinpath(temp_folder).is_dir():
+                            break
+                        num += 1
                     __data = [{"folder": temp_folder, "file": i}
                               for i in more_file[1:]]
                     messages.extend(__data)
