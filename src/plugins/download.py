@@ -8,6 +8,7 @@ from datetime import datetime
 
 from pyrogram import Client, filters
 from pyrogram.types import Message
+from pyrogram.errors import ChatForwardsRestricted
 
 from src import allowed_users
 from src.utils.progress import Progress, ProgressTask
@@ -35,9 +36,12 @@ async def filter_tg_link(client, text):
         return ("Use SuperGroup to download with User!", should_del, is_single)
 
     if session == "user":
-        messages = await client.userbot.copy_message(
-            chat_id=bot_id, from_chat_id=messages.chat.id, message_id=messages.id
-        )
+        try:
+            messages = await client.userbot.copy_message(
+                chat_id=bot_id, from_chat_id=messages.chat.id, message_id=messages.id
+            )
+        except ChatForwardsRestricted:
+            return (messages, should_del, is_single)
         should_del = True
 
     return (
