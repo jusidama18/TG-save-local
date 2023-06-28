@@ -9,7 +9,7 @@ from datetime import datetime
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
-from src import OWNER_ID
+from src import allowed_users
 from src.utils.progress import Progress, ProgressTask
 from src.utils.telegram import get_tg_link_content
 from src.utils.readable import HumanFormat
@@ -47,7 +47,7 @@ async def filter_tg_link(client, text):
     )
 
 
-@Client.on_message(filters.command(["save", "remove"]) & filters.user(OWNER_ID))
+@Client.on_message(filters.command(["save", "remove"]) & filters.user(allowed_users))
 async def save(client, message):
     target: str = message.command[0]
     if target.startswith("save") and message.chat.type.value != "private":
@@ -68,7 +68,7 @@ async def save(client, message):
             text = "**Provide path to remove.**"
         return await message.reply(text, quote=True)
 
-@Client.on_message(filters.private & filters.user(OWNER_ID), group=1)
+@Client.on_message(filters.private & filters.user(allowed_users), group=1)
 async def download(client, message):
     folder_name = None
     download_dir = Path("downloads")

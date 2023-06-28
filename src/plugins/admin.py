@@ -5,10 +5,10 @@ from os import path, listdir, getcwd, execvp
 from pyrogram import Client, filters
 from pyrogram.errors import MessageTooLong
 
-from src import OWNER_ID
+from src import allowed_users
 from src.utils.readable import HumanFormat
 
-@Client.on_message(filters.command(["ls", "log"]) & filters.user(OWNER_ID))
+@Client.on_message(filters.command(["ls", "log"]) & filters.user(allowed_users))
 async def ls(_, message):
     if message.command[0].startswith("log"):
         return await message.reply_document("bot-log.txt", caption="`Bot Log`")
@@ -41,7 +41,7 @@ async def ls(_, message):
             )
 
 
-@Client.on_message(filters.command("restart") & filters.user(OWNER_ID))
+@Client.on_message(filters.command("restart") & filters.user(allowed_users))
 async def restart(_, m):
     await m.reply("Restart will done in few seconds.")
     execvp(executable, [executable, "-m", "src"])

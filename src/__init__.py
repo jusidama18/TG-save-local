@@ -60,4 +60,7 @@ if session_string is not None:
 else:
     app.userbot = None
 
-OWNER_ID = list(map(int, str(getenv("OWNER_ID", "")).split()))
+allowed_users = list(map(int, str(getenv("allowed_users", "")).split()))
+
+if app.userbot:
+    allowed_users.append(app.userbot.me.id)
