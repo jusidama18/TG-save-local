@@ -123,7 +123,6 @@ async def download(client, message):
                     __data = [{"folder": temp_folder, "file": i}
                               for i in more_file[1:]]
                     messages.extend(__data)
-                    num += 1
 
             if not file.empty and file.media:
                 file_data = getattr(file, file.media.value, None)
