@@ -82,10 +82,10 @@ class Progress:
             time_to_completion = round((total - current) / speed)
             estimated_total_time = elapsed_time + time_to_completion
             percentage = current * 100 / total
-            caption += "`[ {0}{1} ] {2}%`\n\n".format(
+            caption += "`[ {0}{1} ] {2:.2%}`\n\n".format(
                 "".join(["▓" for _ in range(math.floor(percentage / 5))]),
                 "".join(["░" for _ in range(20 - math.floor(percentage / 5))]),
-                round(percentage, 2),
+                percentage,
             )
             if self.extra_text is not None and isinstance(self.extra_text, dict):
                 caption += (
